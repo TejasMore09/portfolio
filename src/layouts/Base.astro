@@ -6,6 +6,7 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Cursor from '../components/Cursor.astro';
+import Analytics from '@vercel/analytics/astro';
 import { site } from '../data/site';
 import { OG_SIZE } from '../og/cards';
 
@@ -76,6 +77,7 @@ const jsonLd = {
     <main id="main"><slot /></main>
     {footer && <Footer />}
     <Cursor />
+    <Analytics />
     <script>
       import '../scripts/motion';
     </script>

@@ -1,6 +1,7 @@
 ---
 // The fast, text-only version for anyone short on time: no scripts, no web fonts, one small logo.
 import { Image } from 'astro:assets';
+import Analytics from '@vercel/analytics/astro';
 import { site } from '../data/site';
 import logo from '../assets/brand/logo.png';
 import { projects, totalTests } from '../data/projects';
@@ -84,8 +85,10 @@ import { certificates } from '../data/certificates';
 
     <h2>Skills</h2>
     <p>
-      Python, TypeScript, JavaScript, SQL, Java · RAG, embeddings, pgvector, Gemini, Claude, NLP · FastAPI, Next.js, React,
-      SQLAlchemy · PostgreSQL, MongoDB, MySQL, ChromaDB · Docker, GitHub Actions, Vercel, Render, Neon, OAuth 2.0
+      Python, TypeScript, JavaScript, SQL, Java · Data structures & algorithms, object-oriented design, low-level design,
+      testing & CI · RAG, embeddings, pgvector, Gemini, Claude, NLP · FastAPI, Next.js, React, SQLAlchemy · PostgreSQL,
+      MongoDB, MySQL, ChromaDB · Docker, GitHub Actions, Vercel, Render, Neon, OAuth 2.0
     </p>
+    <Analytics />
   </body>
 </html>
