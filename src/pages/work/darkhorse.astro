@@ -1,0 +1,210 @@
+---
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import Flow from '../../components/Flow.astro';
+import Shot from '../../components/Shot.astro';
+import { projects } from '../../data/projects';
+import { darkhorseFlow } from '../../data/diagrams';
+import tactics from '../../assets/projects/darkhorse/fig-tactics.jpg';
+import quotes from '../../assets/projects/darkhorse/fig-quotes.jpg';
+import notCalibrated from '../../assets/projects/darkhorse/fig-not-calibrated.jpg';
+
+const p = projects.find((x) => x.slug === 'darkhorse')!;
+---
+<ProjectLayout
+  project={p}
+  title="DarkHorse AI — anti-fraud verdicts that show their evidence · Tejas More"
+  facts={[
+    { label: 'Role', value: 'Solo — product, detection, backend, frontend, infra' },
+    { label: 'For', value: 'People and small teams without a security team' },
+    { label: 'Threats', value: 'Invoice fraud, CEO fraud, phishing' },
+    { label: 'Inputs', value: 'Text, links, .eml files, screenshots, voice notes' },
+  ]}>
+  <section class="chapter">
+    <p class="kicker">01 — The problem</p>
+    <h2 data-split>Fraud stopped being a technology problem. It became a psychology problem.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        The expensive attacks now look exactly like ordinary work: a <strong>real</strong> supplier invoice, intercepted so
+        that only the bank details changed; a message from a <strong>genuinely compromised</strong> colleague’s mailbox; a
+        deadline, an instruction not to tell anyone, and a request that is individually reasonable.
+      </p>
+      <p>
+        None of that is detectable by looking for malware. It is detectable by reading what the message is doing to the
+        reader. And the whole category has a second failure: everyone claims “99% accurate” on a number nobody can check —
+        while a product that cries wolf gets switched off, after which it protects nobody.
+      </p>
+    </div>
+    <Shot
+      image={tactics}
+      alt="DarkHorse verdict, “The tactics used here”: “A deadline that does not really exist”, with why it works and what breaks it."
+      caption="From a verdict: the tactic the message used, why it works, and what breaks it."
+    />
+    <blockquote data-reveal>
+      So DarkHorse publishes a number people can hold it to — and would rather say “I could not check that” than produce a
+      comfortable score.
+    </blockquote>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">02 — How it works</p>
+    <h2 data-split>Six independent signals. One honest verdict.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        Three services. <strong>Core</strong>, the detection engine, runs in Docker on Render because it needs system binaries
+        — Tesseract for screenshots, zbar for QR codes — that a serverless function cannot install. <strong>Guard</strong>,
+        the web app, sits on Vercel’s CDN. The browser never talks to Core: everything goes through Guard’s same-origin
+        proxy, so the session cookie stays first-party (Safari blocks third-party cookies outright), and the proxy is an
+        allowlist of twelve paths rather than a blocklist.
+      </p>
+    </div>
+    <Flow diagram={darkhorseFlow} />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">03 — The four rules</p>
+    <h2 data-split>Enforced in code and tests, not in documentation.</h2>
+    <div class="tiles" data-stagger>
+      <div class="tile">
+        <span class="label">Rule 1</span>
+        <h3>Never fail open</h3>
+        <p>A signal that could not run reports <span class="unavailable">UNAVAILABLE</span>, never 0. The verdict carries <code>degraded: true</code> and names what was missed.</p>
+      </div>
+      <div class="tile">
+        <span class="label">Rule 2</span>
+        <h3>Every non-zero score has evidence</h3>
+        <p>If the model claims a finding and none of its quotations verify, the signal reports UNAVAILABLE rather than scoring it.</p>
+      </div>
+      <div class="tile">
+        <span class="label">Rule 3</span>
+        <h3>Isolation lives in the database</h3>
+        <p>Row-level security is <code>FORCE</code>d so even the table owner is subject, and the app role is <code>NOBYPASSRLS</code>. A forgotten <code>WHERE</code> cannot leak.</p>
+      </div>
+      <div class="tile">
+        <span class="label">Rule 4</span>
+        <h3>Context changes the words, never the number</h3>
+        <p>A user’s profession changes the vocabulary of the explanation and which playbook entry is highlighted. It never changes the probability.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">04 — The six signals</p>
+    <h2 data-split>Each one is independent, returns evidence, and can say “I couldn’t run.”</h2>
+    <div class="tiles" data-stagger>
+      <div class="tile"><span class="label">auth</span><h3>Sender authentication</h3><p>SPF, DKIM and DMARC verified from raw headers. Catches a forged <code>From:</code>.</p></div>
+      <div class="tile"><span class="label">domain</span><h3>Registration age</h3><p>How long the sending domain has existed — fresh domains are a classic tell.</p></div>
+      <div class="tile"><span class="label">lookalike</span><h3>Impersonation</h3><p>Domains that read as the real one, measured by edit distance against the registrable domain.</p></div>
+      <div class="tile"><span class="label">url</span><h3>Link reputation</h3><p>Every link checked and recorded as evidence, capped at 40 per message.</p></div>
+      <div class="tile"><span class="label">attachment</span><h3>File analysis</h3><p>Type detected from content, not extension; macros in Office files; mismatches flagged.</p></div>
+      <div class="tile"><span class="label">coercion · the only model call</span><h3>Persuasion analysis</h3><p>Seven levers — authority, urgency, scarcity, reciprocity, social proof, isolation, fear — multiplied by what the message asks you to do. Urgency in a message that asks nothing is just tone.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">05 — The most important decision</p>
+    <div class="callout" data-reveal>
+      <h3>An LLM asked to find persuasion will invent it. So every quote is checked.</h3>
+      <pre class="formula">model returns   lever = urgency
+                quote = "before the board call at 4pm"
+
+verify_spans(quote, original_message)
+  exact or whitespace-insensitive match  →  <span class="ok">evidence, with character offsets</span>
+  not found                              →  <span class="no">finding discarded, not scored</span>
+  every quotation fails                  →  <span class="no">UNAVAILABLE — never zero</span></pre>
+      <p>
+        Nothing looser than whitespace-insensitive matching is accepted, because looser starts accepting paraphrase — and
+        paraphrase is where fabrication hides. The guard’s own cost was measured across 399 real messages: it discarded
+        1 of 15 levers and 2 of 8 requested actions. Two of eight is a count, not a rate (the interval is roughly 7–59%),
+        and the module says so.
+      </p>
+    </div>
+    <Shot
+      image={quotes}
+      alt="DarkHorse evidence: Pressure and persuasion, CHECKED, listing three phrases quoted from the message."
+      caption="What reaches the screen: only quotes found in the message itself — “before the board call at 4pm” among them."
+    />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">06 — The number it publishes</p>
+    <h2 data-split>A false-positive rate anyone can reproduce.</h2>
+    <div class="numbers" data-stagger>
+      <div><b>1.355%</b><span>false positives — 9 of 664 legitimate messages</span></div>
+      <div><b>11.1%</b><span>recall at that threshold — 6 of 54 malicious</span></div>
+      <div><b>0.460</b><span>decision threshold</span></div>
+      <div><b>718</b><span>messages in the frozen held-out set</span></div>
+    </div>
+    <div class="prose" data-reveal>
+      <p>
+        The set is fingerprinted (<code>9fc2bac7e80a21ce</code>) and the number reproduces with one command,
+        <code>python -m darkhorse.eval</code>. Its scope is stated next to it: three of six signals, network off, on corpora
+        that predate 2010 — a floor on a narrow slice, not a verdict on the whole system. Recall is low because the product is
+        tuned hard against false alarms, and the page says that too.
+      </p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">07 — The number I withdrew</p>
+    <div class="callout" data-reveal>
+      <h3>An earlier, better-looking figure — 0.55% — was published, then withdrawn.</h3>
+      <p>
+        It could not be reproduced in any configuration. Worse, the pair it was published with (0.55% false positives at
+        1.96% recall) is not on the achievable curve at all: recall falls as the threshold rises, so 1.96% recall must cost
+        <em>more</em> false positives than 0.925%, never fewer. The method had never been recorded next to the number, so the
+        gap could be reported but not diagnosed.
+      </p>
+      <p>
+        <strong style="color:#fff">The rule since: the number and the command that produces it ship together</strong> — and
+        the landing page publishes the count alongside the rate.
+      </p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">08 — Calibration, honestly</p>
+    <h2 data-split>The verdict tells you when its probability isn’t one.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        Today the six signals combine by <strong>noisy-OR, unfitted</strong>. A fitted logistic model exists in the codebase
+        and is <strong>refused at load</strong> — it failed its own sanity gate, and a model that fails validation must not
+        silently become the thing producing probabilities. So every verdict carries its calibration version, and the page a
+        user reads says: “this score is an unfitted combination of the individual signals and is not a calibrated
+        probability.”
+      </p>
+    </div>
+    <Shot
+      image={notCalibrated}
+      alt="DarkHorse verdict “Nothing suspicious found”, 0% likely an attack, stating that the score is not a calibrated probability."
+      caption="The same sentence on the verdict screen — here, for a message that looks genuine."
+    />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">09 — What isn’t finished</p>
+    <h2 data-split>Honest limitations.</h2>
+    <ol class="defects" data-stagger>
+      <li><div><strong>Recall is low — 11.1% at the published threshold.</strong><p>The product is tuned hard against false positives, which costs misses.</p></div></li>
+      <li><div><strong>The eval covers three of six signals.</strong><p>Network off, corpora that predate 2010. Next: re-run with all six signals and the network on.</p></div></li>
+      <li><div><strong>The domain signal is off in deployment.</strong><p>So most live verdicts are marked partial — and say so.</p></div></li>
+      <li><div><strong>The fusion model is uncalibrated.</strong><p>Fitting one needs a labelled set large enough to fit on — which is what the in-product feedback (“what did this turn out to be?”) is collecting.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">10 — Built for production</p>
+    <h2 data-split>The unglamorous parts.</h2>
+    <div class="numbers" data-stagger>
+      <div><b>1,135</b><span>tests, CI-gated</span></div>
+      <div><b>~1.2 s</b><span>per text check, including persuasion analysis</span></div>
+      <div><b>0.4–1.4 ms</b><span>for the deterministic signals alone</span></div>
+      <div><b>$0.00048</b><span>model cost per check, tracked per tenant</span></div>
+    </div>
+    <div class="prose" data-reveal>
+      <p>
+        Row-level security verified in production, not only in tests. Argon2 password hashing, rate limiting, a hash-chained
+        audit trail, GDPR-shaped account erasure, and a multi-stage Docker image with no compiler at runtime.
+      </p>
+    </div>
+  </section>
+</ProjectLayout>

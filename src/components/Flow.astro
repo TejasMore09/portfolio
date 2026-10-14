@@ -1,0 +1,178 @@
+---
+// Architecture diagram as plain HTML: lanes of steps joined by a spine, side notes
+// for exits/reads, and an optional shared store. Layout adapts via container queries.
+import type { FlowDiagram, StepKind } from '../data/diagrams';
+interface Props { diagram: FlowDiagram }
+const { diagram: d } = Astro.props;
+const defaultTag: Record<StepKind, string | undefined> = { llm: 'LLM', check: 'Check', io: undefined, step: undefined };
+const two = d.lanes.length > 1;
+---
+<figure class:list={['flow', { two }]}>
+  <ul class="legend" role="list">
+    <li><span class="sw k-llm"></span>LLM call</li>
+    <li><span class="sw k-check"></span>Deterministic check</li>
+    <li><span class="sw k-step"></span>Processing</li>
+    <li><span class="sw k-io"></span>Data in / out</li>
+  </ul>
+
+  <div class="grid">
+    {d.lanes.map((lane, i) => (
+      <div class:list={['lane', i === 0 ? 'lane-a' : 'lane-b']}>
+        {lane.title && (
+          <p class="lane-title">{lane.title}{lane.subtitle && <span class="sub"> · {lane.subtitle}</span>}</p>
+        )}
+        <ol role="list">
+          {lane.steps.map((s) => {
+            const tag = s.tag ?? defaultTag[s.kind];
+            return (
+              <li class:list={['step', `k-${s.kind}`]}>
+                <div class="box">
+                  {tag && <span class="tag">{tag}</span>}
+                  <span class="title">{s.title}</span>
+                  {s.detail && <span class="detail">{s.detail}</span>}
+                </div>
+                {s.notes && (
+                  <div class="notes">
+                    {s.notes.map((n) => (
+                      <p class:list={['note', `n-${n.kind}`]}><span class="nk">{n.kind}</span>{n.text}</p>
+                    ))}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+        {lane.writes && d.store && <p class="writes"><span>{lane.writes}</span></p>}
+      </div>
+    ))}
+
+    {d.store && (
+      <div class="box store">
+        <span class="tag">Store</span>
+        <span class="title">{d.store.title}</span>
+        <span class="detail">{d.store.detail}</span>
+      </div>
+    )}
+  </div>
+
+  <figcaption>
+    <p>{d.caption}</p>
+    {d.runsOn && <p class="runs">{d.runsOn}</p>}
+  </figcaption>
+</figure>
+
+<style>
+  .flow {
+    --line: var(--muted);
+    --spine-x: 1.25rem;
+    --llm-bg: var(--panel);
+    container: flow / inline-size;
+    margin: 2rem 0 2.5rem;
+  }
+  @supports (color: color-mix(in srgb, red 50%, blue)) {
+    .flow { --llm-bg: color-mix(in srgb, var(--accent) 8%, var(--bg)); }
+  }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem;
+    list-style: none; padding: 0; margin: 0 0 1.25rem;
+    font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+  }
+  .legend li { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; }
+  .sw { display: inline-block; width: 0.95rem; height: 0.6rem; border: 1px solid var(--rule); background: var(--bg); border-radius: 2px; }
+  .sw.k-llm { border-color: var(--accent); background: var(--llm-bg); }
+  .sw.k-check { border: 1.5px solid var(--ink); }
+  .sw.k-io { border: 1px dashed var(--muted); }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: 'a' 's' 'b'; }
+  .lane { container: lane / inline-size; display: flex; flex-direction: column; min-width: 0; }
+  .lane-a { grid-area: a; }
+  .lane-b { grid-area: b; margin-top: 2.25rem; }
+  .store { grid-area: s; }
+
+  .lane-title {
+    margin: 0 0 0.9rem; font-family: var(--mono); font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink);
+  }
+  .lane-title .sub { color: var(--muted); text-transform: none; letter-spacing: 0; }
+
+  .flow ol { list-style: none; margin: 0; padding: 0; }
+  .flow .step { position: relative; margin: 0; padding-bottom: 1.5rem; }
+  .flow .step:last-child { padding-bottom: 0; }
+  /* spine: runs behind the opaque boxes, visible in the gaps */
+  .flow .step:not(:last-child)::before {
+    content: ''; position: absolute; left: var(--spine-x); top: 1rem; bottom: 0;
+    border-left: 1px solid var(--line);
+  }
+
+  .box {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; gap: 0.1rem;
+    padding: 0.55rem 0.75rem 0.6rem;
+    background: var(--bg); border: 1px solid var(--rule); border-radius: 3px;
+  }
+  /* arrowhead into every box after the first */
+  .flow .step + .step > .box::before,
+  .writes::after {
+    content: ''; position: absolute; left: calc(var(--spine-x) - 5px);
+    width: 8px; height: 8px; transform: rotate(45deg);
+    border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .flow .step + .step > .box::before { top: -10px; }
+
+  .k-llm > .box { border-color: var(--accent); background: var(--llm-bg); }
+  .k-check > .box { border: 1.5px solid var(--ink); }
+  .k-io > .box { border: 1px dashed var(--muted); }
+  .store { background: var(--panel); }
+
+  .tag { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .k-llm .tag { color: var(--accent); }
+  .k-check .tag { color: var(--ink); }
+  .title { color: var(--ink); font-size: 1rem; line-height: 1.3; }
+  .detail { font-family: var(--mono); font-size: 0.72rem; line-height: 1.45; color: var(--muted); }
+
+  .notes { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.45rem 0 0 calc(var(--spine-x) + 1rem); }
+  .note { margin: 0; font-family: var(--mono); font-size: 0.7rem; line-height: 1.45; color: var(--muted); }
+  .n-exit, .n-holds { color: var(--accent); }
+  .nk {
+    display: inline-block; margin-right: 0.45em; padding: 0 0.3em;
+    font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+    border: 1px solid currentColor; border-radius: 2px;
+  }
+
+  /* connector from a lane's end into the shared store; stretches to fill the row */
+  .writes { position: relative; flex: 1; min-height: 2.75rem; margin: 0; }
+  .writes::before {
+    content: ''; position: absolute; left: var(--spine-x); top: 0; bottom: 6px;
+    border-left: 1px solid var(--line);
+  }
+  .writes::after { bottom: 1px; }
+  .writes span {
+    position: absolute; left: calc(var(--spine-x) + 0.75rem); top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  }
+
+  figcaption { margin-top: 1.1rem; font-size: 0.92rem; color: var(--muted); }
+  figcaption p { margin: 0 0 0.35rem; }
+  .runs { font-family: var(--mono); font-size: 0.72rem; }
+
+  /* wide single lane: notes branch off to the right */
+  @container lane (min-width: 30rem) {
+    .flow .step {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 14rem);
+      column-gap: 1.75rem;
+    }
+    .box { align-self: start; } /* keeps the arrowhead on the incoming spine */
+    .notes { position: relative; margin: 0; align-self: center; }
+    .notes::before {
+      content: ''; position: absolute; right: calc(100% + 0.35rem); top: 50%;
+      width: 1.4rem; border-top: 1px dashed var(--line);
+    }
+  }
+
+  /* wide two-lane: lanes side by side above the shared store */
+  @container flow (min-width: 36rem) {
+    .two .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: 'a b' 's s'; column-gap: 2rem; }
+    .two .lane-b { margin-top: 0; padding-bottom: 1.75rem; }
+  }
+</style>

@@ -1,0 +1,86 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { certificates } from '../data/certificates';
+---
+<Base title="Certificates · Tejas More" description="Machine Learning Specialization (DeepLearning.AI), Object-Oriented Programming and Data Structures & Algorithms.">
+  <PageHero
+    eyebrow="Certificates"
+    title="Foundations, certified."
+    lead="The coursework under the systems. Each certificate opens the original on Google Drive."
+    hues={['var(--blue)', 'var(--aether)']}
+  />
+  <section class="section-tight" data-theme="light">
+    <div class="container grid" data-stagger>
+      {
+        certificates.map((c) => (
+          <a class="cert" href={c.url} target="_blank" rel="noopener" style={`--hue: ${c.hue}`} data-cursor="Open" data-tilt>
+            <div class="paper">
+              <Image src={c.image} alt={`${c.title} certificate, ${c.issuer}`} widths={[480, 760, 1024]} sizes="(max-width: 900px) 90vw, 380px" />
+            </div>
+            <div class="meta">
+              <span class="label">{c.issuer}</span>
+              <h2 class="h3">{c.title}</h2>
+              <p>{c.topic}</p>
+              <span class="open">View certificate ↗</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    padding-bottom: clamp(64px, 10vw, 120px);
+  }
+  .cert {
+    display: grid;
+    gap: 0;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--rule);
+    text-decoration: none;
+    position: relative;
+  }
+  .paper {
+    aspect-ratio: 4 / 3;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+    background: radial-gradient(80% 80% at 50% 0%, color-mix(in srgb, var(--hue) 22%, transparent), transparent 70%), var(--panel);
+  }
+  .paper :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.35);
+  }
+  .meta {
+    padding: 22px 24px 26px;
+    display: grid;
+    gap: 8px;
+  }
+  .meta p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .open {
+    margin-top: 8px;
+    color: var(--accent);
+    font-weight: 560;
+  }
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

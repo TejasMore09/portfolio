@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import PostList from '../components/PostList.astro';
+import { site } from '../data/site';
+import { getPosts } from '../data/medium';
+
+const posts = await getPosts();
+---
+<Base title="Writing · Tejas More" description="Notes on building AI systems that can be checked, published on Medium.">
+  <PageHero
+    eyebrow="Writing"
+    title="Notes from the build."
+    lead="On building AI systems that can be checked — the decisions, the numbers, and what went wrong. Published on Medium."
+    hues={['var(--blue)', 'var(--darkhorse)']}>
+    <div class="cta-row hero-cta">
+      <a class="btn btn-primary" href={site.medium} target="_blank" rel="noopener" data-magnetic>Follow on Medium ↗</a>
+    </div>
+  </PageHero>
+
+  <section class="section-tight writing" data-theme="light">
+    <div class="container">
+      <PostList posts={posts} variant="rows">
+        <div class="empty card" slot="empty">
+          <span class="label">Status</span>
+          <h2 class="h3">Nothing published yet — the first posts are being written.</h2>
+          <p>
+            They will appear here automatically. Until then, each case study tells the full story of one project:{' '}
+            <a class="link" href="/work/darkhorse">DarkHorse AI</a>, <a class="link" href="/work/aether">Aether</a> and{' '}
+            <a class="link" href="/work/fintrust">Fintrust</a>.
+          </p>
+        </div>
+      </PostList>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero-cta {
+    margin-top: 32px;
+  }
+  .writing {
+    padding-bottom: clamp(112px, 16vw, 216px);
+  }
+  .empty {
+    max-width: 760px;
+  }
+  .empty h2 {
+    margin: 10px 0 12px;
+  }
+  .empty p {
+    color: var(--muted);
+    margin: 0;
+  }
+</style>

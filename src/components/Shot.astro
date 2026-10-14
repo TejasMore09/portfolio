@@ -1,0 +1,62 @@
+---
+// A product screenshot inside a case study, next to the text it supports. Never shown larger than
+// it was captured (`density` 2 for retina captures), so small UI text stays sharp.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  image: ImageMetadata;
+  alt: string;
+  caption: string;
+  density?: number;
+  dark?: boolean;
+}
+const { image, alt, caption, density = 1, dark = false } = Astro.props;
+const w = Math.round(image.width / density);
+const widths = [...[480, 760, 1040, 1440].filter((x) => x < image.width), image.width];
+---
+<figure class:list={['shot', { 'shot-dark': dark }]} style={`--shot-w: ${w}px`} data-reveal>
+  <div class="shot-media">
+    <Image src={image} alt={alt} widths={widths} sizes={`(max-width: ${w + 64}px) 90vw, ${w}px`} loading="lazy" />
+  </div>
+  <figcaption><span class="label">In the product</span>{caption}</figcaption>
+</figure>
+
+<style>
+  .shot {
+    width: 100%;
+    max-width: var(--shot-w);
+    margin: 36px 0 12px;
+  }
+  .shot-media {
+    border-radius: var(--r-md);
+    overflow: hidden;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px var(--rule),
+      0 28px 60px -34px rgba(16, 24, 40, 0.32);
+  }
+  .shot-dark .shot-media {
+    background: #0b0b0d;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.18),
+      0 28px 60px -30px rgba(16, 24, 40, 0.5);
+  }
+  .shot-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  figcaption {
+    margin-top: 14px;
+    max-width: 64ch;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  figcaption .label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--ink-accent, var(--muted));
+  }
+</style>

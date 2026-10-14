@@ -1,0 +1,83 @@
+---
+import '@fontsource-variable/inter/opsz.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Cursor from '../components/Cursor.astro';
+import { site } from '../data/site';
+import { OG_SIZE } from '../og/cards';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string; // site-relative path to a link-preview card from src/pages/og/
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  footer?: boolean;
+}
+const {
+  title = `${site.name} — ${site.role}`,
+  description = `${site.role} in ${site.location}. ${site.positioning}`,
+  image = '/og/home.png',
+  imageAlt = `${site.name}, ${site.role}. ${site.positioning}`,
+  type = 'website',
+  footer = true,
+} = Astro.props;
+// build.format 'file' reports '/work/fintrust.html'; the public URL is '/work/fintrust'.
+const pathname = Astro.url.pathname.replace(/(index)?\.html$/, '').replace(/(.)\/$/, '$1');
+const canonical = new URL(pathname, site.url).href;
+const imageUrl = new URL(image, site.url).href;
+const sameAs = [site.linkedin, site.github, site.medium].filter(Boolean);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: site.name,
+    jobTitle: site.role,
+    url: site.url,
+    email: `mailto:${site.email}`,
+    address: { '@type': 'PostalAddress', addressLocality: 'Mumbai', addressCountry: 'IN' },
+    sameAs,
+  },
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="author" content={site.name} />
+    <meta name="theme-color" content="#f5f5f7" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content={String(OG_SIZE.width)} />
+    <meta property="og:image:height" content={String(OG_SIZE.height)} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={imageUrl} />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main"><slot /></main>
+    {footer && <Footer />}
+    <Cursor />
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>

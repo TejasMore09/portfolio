@@ -1,0 +1,257 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '../data/site';
+import logo from '../assets/brand/logo.png';
+
+const links = [
+  { href: '/work', label: 'Work' },
+  { href: '/writing', label: 'Writing' },
+  { href: '/certificates', label: 'Certificates' },
+  { href: '/about', label: 'About' },
+];
+const here = Astro.url.pathname.replace(/(index)?\.html$/, '').replace(/(.)\/$/, '$1');
+const active = (href: string) => here === href || here.startsWith(`${href}/`);
+---
+<header class="nav" data-nav data-tone="light">
+  <div class="nav-pill">
+    <a href="/" class="brand" aria-label={`${site.name}, home`}>
+      <Image src={logo} alt="" class="logo" width={144} widths={[48, 96, 144]} sizes="44px" loading="eager" />
+      <span class="brand-name">{site.name}</span>
+    </a>
+    <nav aria-label="Primary" class="nav-links">
+      {
+        links.map((l) => (
+          <a href={l.href} class:list={['roll', { active: active(l.href) }]} aria-current={active(l.href) ? 'page' : undefined}>
+            <span data-text={l.label}>{l.label}</span>
+          </a>
+        ))
+      }
+    </nav>
+    <div class="nav-actions">
+      {site.resume && <a class="nav-ghost" href={site.resume}>Résumé</a>}
+      <a class="nav-cta" href={`mailto:${site.email}`} data-magnetic>Let’s talk</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle>
+        <span></span><span></span><span class="sr-only">Menu</span>
+      </button>
+    </div>
+  </div>
+  <div class="menu" id="menu" data-menu hidden>
+    <nav aria-label="Mobile" class="menu-links">
+      <a href="/">Home</a>
+      {links.map((l) => <a href={l.href}>{l.label}</a>)}
+      {site.resume && <a href={site.resume}>Résumé</a>}
+      <a href={`mailto:${site.email}`}>Email me</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    if (menu) menu.hidden = !open;
+    document.documentElement.classList.toggle('menu-open', open);
+  });
+</script>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 12px 0 auto;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    padding: 0 12px;
+    pointer-events: none;
+    --pill: rgba(255, 255, 255, 0.72);
+    --pill-ink: #1d1d1f;
+    --pill-muted: #6e6e73;
+    --pill-line: rgba(0, 0, 0, 0.08);
+  }
+  .nav[data-tone='dark'] {
+    --pill: rgba(22, 22, 26, 0.62);
+    --pill-ink: #f5f5f7;
+    --pill-muted: #a1a1a6;
+    --pill-line: rgba(255, 255, 255, 0.12);
+  }
+  .nav-pill {
+    pointer-events: auto;
+    width: min(100%, 1120px);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 10px 0 18px;
+    border-radius: 999px;
+    background: var(--pill);
+    color: var(--pill-ink);
+    box-shadow:
+      0 0 0 1px var(--pill-line),
+      0 12px 40px -18px rgba(0, 0, 0, 0.35);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    transition:
+      background-color 0.4s,
+      color 0.4s,
+      box-shadow 0.4s;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: 640;
+    letter-spacing: -0.02em;
+    margin-right: auto;
+  }
+  .brand :global(.logo) {
+    height: 30px;
+    width: auto;
+    flex: none;
+    transition: filter 0.4s;
+  }
+  /* White letter faces need a little separation on the light nav. */
+  .nav[data-tone='light'] .brand :global(.logo) {
+    filter: drop-shadow(0 1px 1.5px rgba(16, 28, 80, 0.38));
+  }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+  }
+  .roll {
+    position: relative;
+    display: inline-flex;
+    height: 38px;
+    align-items: center;
+    padding: 0 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.94rem;
+    font-weight: 520;
+    color: var(--pill-muted);
+    overflow: hidden;
+    transition:
+      color 0.3s,
+      background-color 0.3s;
+  }
+  .roll span {
+    display: block;
+    position: relative;
+    transition: transform 0.55s var(--ease);
+  }
+  .roll span::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    padding-top: 0.6em;
+  }
+  .roll:hover {
+    color: var(--pill-ink);
+  }
+  .roll:hover span {
+    transform: translateY(calc(-100% - 0.6em));
+  }
+  .roll.active {
+    color: var(--pill-ink);
+    background: color-mix(in srgb, var(--pill-ink) 8%, transparent);
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .nav-ghost,
+  .nav-cta {
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 560;
+    text-decoration: none;
+  }
+  .nav-ghost {
+    color: var(--pill-ink);
+  }
+  .nav-cta {
+    background: var(--pill-ink);
+    color: var(--pill);
+  }
+  .nav[data-tone='dark'] .nav-cta {
+    color: #000;
+  }
+  .nav[data-tone='light'] .nav-cta {
+    color: #fff;
+  }
+  .menu-btn {
+    display: none;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--pill-ink);
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .menu-btn span:not(.sr-only) {
+    width: 18px;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.4s var(--ease);
+  }
+  .menu-btn[aria-expanded='true'] span:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+  .menu-btn[aria-expanded='true'] span:nth-child(2) {
+    transform: translateY(-3.75px) rotate(-45deg);
+  }
+  .menu {
+    pointer-events: auto;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: rgba(10, 10, 12, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: grid;
+    place-items: center;
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .menu-links {
+    display: grid;
+    gap: 6px;
+    text-align: center;
+  }
+  .menu-links a {
+    color: #f5f5f7;
+    text-decoration: none;
+    font-size: clamp(2rem, 9vw, 3rem);
+    font-weight: 650;
+    letter-spacing: -0.035em;
+  }
+  @media (max-width: 860px) {
+    .nav-links,
+    .nav-ghost {
+      display: none;
+    }
+    .menu-btn {
+      display: inline-flex;
+    }
+  }
+  @media (max-width: 420px) {
+    .brand-name {
+      display: none;
+    }
+  }
+</style>

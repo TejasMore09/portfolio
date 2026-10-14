@@ -1,0 +1,91 @@
+---
+// The fast, text-only version for anyone short on time: no scripts, no web fonts, one small logo.
+import { Image } from 'astro:assets';
+import { site } from '../data/site';
+import logo from '../assets/brand/logo.png';
+import { projects, totalTests } from '../data/projects';
+import { certificates } from '../data/certificates';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{site.name} — {site.role} (text version)</title>
+    <meta name="description" content={`${site.role} in ${site.location}. ${site.positioning}`} />
+    <link rel="canonical" href={new URL('/lite', site.url).href} />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <style>
+      body { margin: 0 auto; max-width: 720px; padding: 40px 20px 80px; font: 17px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: #1d1d1f; background: #fff; }
+      h1 { font-size: 2rem; margin: 0; letter-spacing: -0.02em; display: flex; align-items: center; gap: 12px; }
+      h1 img { height: 34px; width: auto; filter: drop-shadow(0 1px 1.5px rgba(16, 28, 80, 0.38)); }
+      h2 { font-size: 1.15rem; margin: 2.2em 0 0.6em; padding-top: 1em; border-top: 1px solid #e5e5ea; }
+      h3 { font-size: 1.02rem; margin: 1.4em 0 0.2em; }
+      p, li { color: #3a3a3c; }
+      a { color: #0b57d0; }
+      ul { padding-left: 1.2em; }
+      .muted { color: #6e6e73; }
+      code { font-size: 0.9em; }
+    </style>
+  </head>
+  <body>
+    <h1><Image src={logo} alt="" width={128} widths={[64, 128]} sizes="48px" loading="eager" />{site.name}</h1>
+    <p><strong>{site.role}</strong> · {site.location} · {site.status}</p>
+    <p>{site.positioning}</p>
+    <p>
+      <a href={`mailto:${site.email}`}>{site.email}</a> · <a href={site.linkedin}>LinkedIn</a>
+      {site.github && <> · <a href={site.github}>GitHub</a></>}
+      {site.resume && <> · <a href={site.resume}>Résumé (PDF)</a></>}
+      · <a href="/">Full site</a>
+    </p>
+
+    <h2>Projects ({totalTests.toLocaleString('en-US')} tests across all three)</h2>
+    {
+      projects.map((p) => (
+        <>
+          <h3>
+            {p.name} — {p.tagline}
+          </h3>
+          <p class="muted">{p.period} · {p.stack.join(', ')}</p>
+          <p>{p.summary}</p>
+          <ul>
+            {p.metrics.map((m) => (
+              <li>
+                <strong>{m.value}</strong> {m.label}
+                {m.context && <span class="muted"> ({m.context})</span>}
+              </li>
+            ))}
+          </ul>
+          <p>
+            <a href={p.live.url}>{p.live.label}</a> · <a href={p.caseStudy}>Case study</a>
+            {p.repo.private && <span class="muted"> · source in a private repo, walkthrough on request</span>}
+          </p>
+        </>
+      ))
+    }
+
+    <h2>Experience</h2>
+    <ul>
+      <li><strong>Elevate Labs</strong> — AI &amp; ML internship and DevOps internship, remote (2025)</li>
+      <li><strong>IBM Think</strong> — tech volunteer, Mumbai (2024 – 2025)</li>
+    </ul>
+
+    <h2>Education</h2>
+    <ul>
+      <li><strong>TransStadia Institute, Mumbai</strong> — B.Sc. Artificial Intelligence &amp; Sports Analytics, CGPA 9.71 (2023 – 2026)</li>
+      <li><strong>Patkar College of Arts and Science</strong> — Science, PCM + Electronics (2021 – 2023)</li>
+    </ul>
+
+    <h2>Certificates</h2>
+    <ul>
+      {certificates.map((c) => <li><a href={c.url}>{c.title}</a> — {c.issuer}</li>)}
+    </ul>
+
+    <h2>Skills</h2>
+    <p>
+      Python, TypeScript, JavaScript, SQL, Java · RAG, embeddings, pgvector, Gemini, Claude, NLP · FastAPI, Next.js, React,
+      SQLAlchemy · PostgreSQL, MongoDB, MySQL, ChromaDB · Docker, GitHub Actions, Vercel, Render, Neon, OAuth 2.0
+    </p>
+  </body>
+</html>

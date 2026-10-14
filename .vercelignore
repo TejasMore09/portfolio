@@ -1,0 +1,11 @@
+# Upload only what the build needs; Vercel installs dependencies and builds remotely.
+node_modules
+dist
+.astro
+.claude
+research_notes
+reports
+# Local secrets (vercel link writes a VERCEL_OIDC_TOKEN here)
+.env*
+# Source of src/assets/brand/logo.png (keyed and cropped); not served
+/logo.png

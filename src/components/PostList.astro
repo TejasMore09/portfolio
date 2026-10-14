@@ -1,0 +1,188 @@
+---
+// Medium posts. Renders what the build knew, then refreshes from /api/medium (cached ~30 min at
+// Vercel's edge), so a new post shows up on the live site without a redeploy.
+import type { Post } from '../lib/medium';
+
+interface Props {
+  posts: Post[];
+  variant: 'cards' | 'rows';
+  limit?: number;
+}
+const { posts: all, variant, limit = 99 } = Astro.props;
+const posts = all.slice(0, limit);
+const dateOpts: Intl.DateTimeFormatOptions =
+  variant === 'rows' ? { day: 'numeric', month: 'long', year: 'numeric' } : { day: 'numeric', month: 'short', year: 'numeric' };
+const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', dateOpts);
+---
+<div class={`posts posts-${variant}`} data-posts data-reveal data-variant={variant} data-limit={limit} data-urls={posts.map((p) => p.url).join('|')}>
+  <div class="items" data-posts-items hidden={posts.length === 0}>
+    {
+      posts.map((p) =>
+        variant === 'cards' ? (
+          <a class="post card" href={p.url} target="_blank" rel="noopener" data-cursor="Read">
+            <span class="label"><span data-date>{fmt(p.date)}</span> · <span data-minutes>{p.minutes}</span> min</span>
+            <h3 class="h3" data-title>{p.title}</h3>
+            <p data-excerpt>{p.excerpt}</p>
+          </a>
+        ) : (
+          <a class="row" href={p.url} target="_blank" rel="noopener" data-cursor="Read">
+            {p.image && <img data-image src={p.image} alt="" loading="lazy" decoding="async" />}
+            <div>
+              <span class="label"><span data-date>{fmt(p.date)}</span> · <span data-minutes>{p.minutes}</span> min read</span>
+              <h2 class="h3" data-title>{p.title}</h2>
+              <p data-excerpt>{p.excerpt}</p>
+            </div>
+            <span class="go" aria-hidden="true">↗</span>
+          </a>
+        ),
+      )
+    }
+  </div>
+  <div data-posts-empty hidden={posts.length > 0}><slot name="empty" /></div>
+  <template data-post-template>
+    {
+      variant === 'cards' ? (
+        <a class="post card" target="_blank" rel="noopener" data-cursor="Read">
+          <span class="label"><span data-date /> · <span data-minutes /> min</span>
+          <h3 class="h3" data-title />
+          <p data-excerpt />
+        </a>
+      ) : (
+        <a class="row" target="_blank" rel="noopener" data-cursor="Read">
+          <img data-image alt="" loading="lazy" decoding="async" />
+          <div>
+            <span class="label"><span data-date /> · <span data-minutes /> min read</span>
+            <h2 class="h3" data-title />
+            <p data-excerpt />
+          </div>
+          <span class="go" aria-hidden="true">↗</span>
+        </a>
+      )
+    }
+  </template>
+</div>
+
+<script>
+  type LivePost = { title: string; url: string; date: string; excerpt: string; image?: string; minutes: number };
+  for (const root of document.querySelectorAll<HTMLElement>('[data-posts]')) {
+    const tpl = root.querySelector<HTMLTemplateElement>('template[data-post-template]');
+    const items = root.querySelector<HTMLElement>('[data-posts-items]');
+    const empty = root.querySelector<HTMLElement>('[data-posts-empty]');
+    if (!tpl || !items) continue;
+    const limit = Number(root.dataset.limit) || 99;
+    const fmt = new Intl.DateTimeFormat(
+      'en-GB',
+      root.dataset.variant === 'rows' ? { day: 'numeric', month: 'long', year: 'numeric' } : { day: 'numeric', month: 'short', year: 'numeric' },
+    );
+    fetch('/api/medium', { headers: { accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { ok: boolean; posts: LivePost[] } | null) => {
+        if (!data?.ok) return; // keep what the build rendered
+        const posts = data.posts.slice(0, limit);
+        const key = posts.map((p) => p.url).join('|');
+        if (key === (root.dataset.urls ?? '')) return;
+        items.replaceChildren(
+          ...posts.map((p) => {
+            const node = tpl.content.firstElementChild!.cloneNode(true) as HTMLAnchorElement;
+            node.href = p.url;
+            node.querySelector('[data-title]')!.textContent = p.title;
+            node.querySelector('[data-excerpt]')!.textContent = p.excerpt;
+            node.querySelector('[data-date]')!.textContent = fmt.format(new Date(p.date));
+            node.querySelector('[data-minutes]')!.textContent = String(p.minutes);
+            const img = node.querySelector<HTMLImageElement>('[data-image]');
+            if (img) {
+              if (p.image) img.src = p.image;
+              else img.remove();
+            }
+            return node;
+          }),
+        );
+        root.dataset.urls = key;
+        items.hidden = posts.length === 0;
+        if (empty) empty.hidden = posts.length > 0;
+      })
+      .catch(() => {});
+  }
+</script>
+
+<style>
+  .items[hidden],
+  [data-posts-empty][hidden] {
+    display: none;
+  }
+  /* cards (home) */
+  .posts-cards .items {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .posts-cards :global(.post) {
+    text-decoration: none;
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    transition: transform 0.5s var(--ease);
+  }
+  .posts-cards :global(.post:hover) {
+    transform: translateY(-4px);
+  }
+  .posts-cards :global(.post p) {
+    color: var(--muted);
+    margin: 0;
+  }
+  /* rows (writing page) */
+  .posts-rows .items {
+    display: grid;
+  }
+  .posts-rows :global(.row) {
+    display: grid;
+    grid-template-columns: 220px 1fr auto;
+    gap: 28px;
+    align-items: center;
+    padding: 28px 0;
+    border-top: 1px solid var(--rule);
+    text-decoration: none;
+  }
+  .posts-rows :global(.row:not(:has(img))) {
+    grid-template-columns: 1fr auto;
+  }
+  .posts-rows :global(.row img) {
+    width: 220px;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: var(--r-md);
+  }
+  .posts-rows :global(.row h2) {
+    margin: 8px 0;
+  }
+  .posts-rows :global(.row p) {
+    margin: 0;
+    color: var(--muted);
+  }
+  .posts-rows :global(.go) {
+    font-size: 1.4rem;
+    color: var(--muted);
+    transition: transform 0.4s var(--ease);
+  }
+  .posts-rows :global(.row:hover .go) {
+    transform: translate(4px, -4px);
+    color: var(--ink);
+  }
+  @media (max-width: 860px) {
+    .posts-cards .items {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 700px) {
+    .posts-rows :global(.row),
+    .posts-rows :global(.row:not(:has(img))) {
+      grid-template-columns: 1fr;
+    }
+    .posts-rows :global(.row img) {
+      width: 100%;
+    }
+    .posts-rows :global(.go) {
+      display: none;
+    }
+  }
+</style>

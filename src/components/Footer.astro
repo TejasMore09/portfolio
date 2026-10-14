@@ -1,0 +1,126 @@
+---
+import { site } from '../data/site';
+---
+<footer class="footer dark grain" data-theme="dark">
+  <div class="glow g1" aria-hidden="true"></div>
+  <div class="glow g2" aria-hidden="true"></div>
+  <div class="container footer-inner">
+    <p class="label">Let’s talk</p>
+    <h2 class="h1 footer-title" data-split>Let’s build AI<br /> that shows its work.</h2>
+    <div class="cta-row" data-reveal>
+      <a class="btn btn-big" href={`mailto:${site.email}`} data-magnetic data-cursor="Email">{site.email}</a>
+      {site.resume && <a class="btn btn-ghost" href={site.resume}>Download résumé</a>}
+    </div>
+    <div class="footer-grid">
+      <div>
+        <p class="label">Elsewhere</p>
+        <ul>
+          <li><a href={site.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          {site.github && <li><a href={site.github} target="_blank" rel="noopener">GitHub ↗</a></li>}
+          <li><a href={site.medium} target="_blank" rel="noopener">Medium ↗</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="label">Pages</p>
+        <ul>
+          <li><a href="/work">Work</a></li>
+          <li><a href="/writing">Writing</a></li>
+          <li><a href="/certificates">Certificates</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="label">Based in</p>
+        <p class="plain">{site.location}<br />{site.timezone}</p>
+        <p class="label quick">In a hurry?</p>
+        <p class="plain"><a href="/lite">The one-page text version →</a></p>
+      </div>
+    </div>
+    <div class="footer-base">
+      <span>© {new Date().getFullYear()} {site.name}</span>
+      <span>Headline numbers expand to show how they were measured.</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    overflow: clip;
+    padding: clamp(96px, 14vw, 180px) 0 40px;
+    background: #050507;
+  }
+  .g1 {
+    width: 46vw;
+    height: 46vw;
+    left: -12vw;
+    bottom: -18vw;
+    background: var(--blue);
+    opacity: 0.32;
+  }
+  .g2 {
+    width: 36vw;
+    height: 36vw;
+    right: -8vw;
+    top: -10vw;
+    background: var(--darkhorse);
+    opacity: 0.2;
+  }
+  .footer-inner {
+    position: relative;
+  }
+  .footer-title {
+    margin: 0.4em 0 0.6em;
+    max-width: 14ch;
+  }
+  .btn-big {
+    --h: 64px;
+    padding: 0 30px;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    background: #f5f5f7;
+    color: #000;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    margin-top: clamp(64px, 10vw, 120px);
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+  }
+  .footer-grid ul {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    display: grid;
+    gap: 8px;
+  }
+  .footer-grid a {
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .footer-grid a:hover {
+    color: var(--accent);
+  }
+  .plain {
+    margin: 12px 0 0;
+    color: var(--muted);
+  }
+  .quick {
+    margin-top: 24px;
+  }
+  .footer-base {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 64px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  @media (max-width: 760px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

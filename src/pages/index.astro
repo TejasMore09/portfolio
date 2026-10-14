@@ -1,0 +1,532 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Hero3D from '../components/Hero3D.astro';
+import Metric from '../components/Metric.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PostList from '../components/PostList.astro';
+import { site } from '../data/site';
+import { projects, heroMetrics, totalTests } from '../data/projects';
+import { certificates } from '../data/certificates';
+import { getPosts } from '../data/medium';
+import desk from '../assets/me/desk-2.jpg';
+
+const posts = await getPosts();
+---
+<Base>
+  <!-- 1 · Hero: night studio, a glass prism splitting light into the three projects' colours -->
+  <section class="hero dark" data-theme="dark" data-hero>
+    <Hero3D />
+    <div class="container hero-content intro">
+      <p class="chip hero-chip"><span class="dot"></span><span>{site.status}<span class="chip-where"> · {site.location}</span></span></p>
+      <h1 class="display hero-title">AI that shows<br /> its&nbsp;work.</h1>
+      <p class="lead hero-lead">
+        I’m <strong>{site.name}</strong>, an AI and software engineer. {site.positioning}
+      </p>
+      <div class="cta-row">
+        <a class="btn hero-primary" href="/work" data-magnetic>See the work <span class="arrow">→</span></a>
+        {site.resume && <a class="btn btn-glass" href={site.resume}>Résumé</a>}
+      </div>
+    </div>
+    <div class="container hero-facts" aria-label="At a glance">
+      <span><b>3</b> production AI systems</span>
+      <span><b>{totalTests.toLocaleString('en-US')}</b> tests</span>
+      <span><b>9.71</b> CGPA, B.Sc. AI</span>
+      <span class="scroll-cue" aria-hidden="true">Scroll</span>
+    </div>
+  </section>
+
+  <!-- 2 · Statement -->
+  <section class="section white statement-section" data-theme="light">
+    <div class="container narrow">
+      <p class="label">The approach</p>
+      <p class="statement" data-light-up>
+        Most AI demos stop where the model answers. I build what comes after: code that checks every quote against
+        its source, accuracy numbers that ship with the command that reproduces them, and agents that hold risky
+        actions until a person says yes.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3 · Proof -->
+  <section class="section proof" data-theme="light">
+    <div class="container">
+      <p class="eyebrow gradient-text" style="--g1: var(--blue); --g2: var(--fintrust)">Measured, not asserted</p>
+      <h2 class="h2 proof-title" data-split>Every number ships with its method.</h2>
+      <div class="stat-row" data-stagger>
+        {
+          heroMetrics.map((m, i) => (
+            <div style={`--g1: var(--${['fintrust', 'darkhorse', 'blue'][i]}); --g2: var(--${['fintrust-2', 'darkhorse-2', 'aether'][i]})`}>
+              <Metric metric={m} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · Work: sticky, stacking sneak peeks -->
+  <section class="section work" data-theme="light" id="work">
+    <div class="container">
+      <div class="work-head">
+        <p class="eyebrow">Selected work</p>
+        <h2 class="h2" data-split>Three systems.<br /> All live.</h2>
+        <p class="lead" data-reveal>Built solo, from architecture to production. Open any one for the full story.</p>
+      </div>
+      <div class="stack">
+        {projects.map((p, i) => <ProjectCard project={p} index={i} stack />)}
+      </div>
+      <p class="work-more" data-reveal><a class="link" href="/work">All work →</a></p>
+    </div>
+  </section>
+
+  <!-- 5 · How I build: the pattern, shown in each product's own words -->
+  <section class="section principles dark grain" data-theme="dark">
+    <div class="glow pg1" aria-hidden="true"></div>
+    <div class="container">
+      <p class="eyebrow gradient-text" style="--g1: var(--aether-2); --g2: var(--darkhorse)">How I build</p>
+      <h2 class="h2" data-split>The model is never<br /> the last step.</h2>
+      <div class="pgrid" data-stagger>
+        <article class="pcell">
+          <div class="pviz pviz-quote">
+            <p class="q">“…not later than <mark>21 days of the receipt of the grievance</mark>.”</p>
+            <div class="pviz-row"><span class="status ok">Verified</span><span class="mono">177 shown</span></div>
+            <div class="pviz-row"><span class="status warn">Withheld</span><span class="mono">2, quote not found</span></div>
+          </div>
+          <h3 class="h3">Quotes are checked, not trusted.</h3>
+          <p>
+            In Fintrust and DarkHorse the model must quote its source. Code then finds that quote in the original text —
+            if it isn’t there, the statement is never shown.
+          </p>
+        </article>
+        <article class="pcell">
+          <div class="pviz pviz-list">
+            <div class="pviz-row"><span>Pressure &amp; persuasion</span><span class="status ok">Checked</span></div>
+            <div class="pviz-row"><span>Sender authentication</span><span class="status">Does not apply</span></div>
+            <div class="pviz-row"><span>Domain history</span><span class="status warn">Could not run</span></div>
+          </div>
+          <h3 class="h3">A check that couldn’t run says so.</h3>
+          <p>
+            DarkHorse never scores a skipped check as zero. The verdict names what it missed, so “not checked” can never
+            read as “safe”.
+          </p>
+        </article>
+        <article class="pcell">
+          <div class="pviz pviz-calc">
+            <div class="pviz-row stacked"><span>$387.06/day at risk · $400 to act</span><span class="status ok">Act · pays back in 1.0 day</span></div>
+            <div class="pviz-row stacked"><span>$38.71/day at risk · $400 to act</span><span class="status warn">Decline · 10.3 days</span></div>
+            <p class="mono small">payback horizon: 7 days · then a person approves</p>
+          </div>
+          <h3 class="h3">Acting has to pay for itself.</h3>
+          <p>
+            Aether sizes the daily loss before it acts, declines when the fix costs more than it saves, and holds every
+            high-risk action for the owner.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · About teaser -->
+  <section class="section about-teaser" data-theme="dark">
+    <div class="container about-grid">
+      <div class="about-photo" data-reveal>
+        <Image src={desk} alt="Tejas at his desk at night, lit by a ring lamp, typing" widths={[480, 760, 920]} sizes="(max-width: 900px) 90vw, 520px" data-speed="0.6" />
+      </div>
+      <div class="about-copy">
+        <p class="eyebrow gradient-text" style="--g1: var(--aether-2); --g2: var(--aether)">Behind the work</p>
+        <h2 class="h2" data-split>Built end to end,<br /> by one person.</h2>
+        <p class="lead" data-reveal>
+          B.Sc. in Artificial Intelligence (CGPA 9.71). AI &amp; ML and DevOps intern at Elevate Labs. Tech volunteer at
+          IBM Think. Most nights, building systems that have to be right.
+        </p>
+        <a class="btn btn-ghost" href="/about" data-reveal>More about me <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · Writing -->
+  <section class="section-tight writing white" data-theme="light">
+    <div class="container">
+      <div class="row-head">
+        <div>
+          <p class="eyebrow">Writing</p>
+          <h2 class="h2" data-split>Notes from the build.</h2>
+        </div>
+        <a class="link" href="/writing">All writing →</a>
+      </div>
+      <PostList posts={posts} variant="cards" limit={3}>
+        <div class="medium-empty card" slot="empty">
+          <p>
+            <strong>First posts are on the way.</strong> I write on Medium about building AI systems that can be checked —
+            starting with the stories behind these three projects.
+          </p>
+          <a class="btn btn-primary" href={site.medium} target="_blank" rel="noopener">Follow on Medium ↗</a>
+        </div>
+      </PostList>
+    </div>
+  </section>
+
+  <!-- 8 · Certificates -->
+  <section class="section-tight certs" data-theme="light">
+    <div class="container">
+      <div class="row-head">
+        <div>
+          <p class="eyebrow">Certificates</p>
+          <h2 class="h2" data-split>Foundations, certified.</h2>
+        </div>
+        <a class="link" href="/certificates">All certificates →</a>
+      </div>
+      <div class="cert-grid" data-stagger>
+        {
+          certificates.map((c) => (
+            <a class="cert card" href={c.url} target="_blank" rel="noopener" style={`--hue: ${c.hue}`} data-cursor="Open">
+              <span class="cert-glow" aria-hidden="true" />
+              <span class="label">{c.issuer}</span>
+              <h3 class="h3">{c.title}</h3>
+              <span class="cert-open">View certificate ↗</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* hero */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: clip;
+    background: #03040a;
+    padding-top: calc(var(--nav-h) + 40px);
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+  }
+  .hero-chip {
+    margin-bottom: 26px;
+    color: #f5f5f7;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  /* On phones the location would wrap the badge; it is in the footer anyway. */
+  @media (max-width: 560px) {
+    .chip-where {
+      display: none;
+    }
+  }
+  .hero-title {
+    color: #fff;
+    max-width: 9ch;
+  }
+  .hero-lead {
+    max-width: 34rem;
+    margin: 28px 0 34px;
+    color: rgba(235, 235, 245, 0.72);
+  }
+  .hero-lead strong {
+    color: #fff;
+  }
+  .hero-primary {
+    background: #fff;
+    color: #000;
+  }
+  .hero-facts {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: clamp(48px, 10vh, 110px);
+    padding-bottom: 28px;
+    font-size: 0.9rem;
+    color: rgba(235, 235, 245, 0.62);
+  }
+  .hero-facts b {
+    color: #fff;
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+  .scroll-cue {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .scroll-cue::after {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 28px;
+    margin-left: 10px;
+    vertical-align: middle;
+    background: linear-gradient(currentColor, transparent);
+    animation: cue 2.2s var(--ease) infinite;
+  }
+  @keyframes cue {
+    0% {
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    50% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    51% {
+      transform-origin: bottom;
+    }
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+  }
+  @media (max-width: 760px) {
+    .hero {
+      justify-content: flex-start;
+    }
+    .hero-facts {
+      margin-top: auto;
+    }
+    .scroll-cue {
+      display: none;
+    }
+  }
+
+  /* statement */
+  .statement {
+    font-size: clamp(1.9rem, 4.2vw, 3.5rem);
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    font-weight: 640;
+    color: var(--ink);
+    margin-top: 18px;
+  }
+
+  /* proof */
+  .proof-title {
+    max-width: 16ch;
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .stat-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* work */
+  .work {
+    padding-top: clamp(32px, 4vw, 64px);
+    padding-bottom: clamp(64px, 8vw, 120px);
+  }
+  .work-head {
+    max-width: 760px;
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+  .work-head .lead {
+    margin-top: 18px;
+  }
+  .stack {
+    display: grid;
+    gap: clamp(24px, 4vh, 48px);
+  }
+  .work-more {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  /* principles */
+  .principles {
+    background: #000;
+  }
+  .pg1 {
+    width: 40vw;
+    height: 40vw;
+    right: -10vw;
+    top: 10%;
+    background: var(--aether);
+    opacity: 0.18;
+  }
+  .pgrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: clamp(48px, 6vw, 80px);
+  }
+  .pcell {
+    background: #111113;
+    border-radius: var(--r-lg);
+    padding: 22px 22px 28px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  .pcell h3 {
+    margin: 26px 0 10px;
+  }
+  .pcell p {
+    color: var(--muted);
+    margin: 0;
+  }
+  .pviz {
+    border-radius: var(--r-md);
+    background: #1a1a1d;
+    padding: 16px;
+    display: grid;
+    gap: 10px;
+    font-size: 0.86rem;
+    min-height: 168px;
+    align-content: center;
+  }
+  .pviz-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+  }
+  .pviz .mono {
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+  .pviz .q {
+    margin: 0 0 4px;
+    line-height: 1.5;
+  }
+  .pviz mark {
+    background: color-mix(in srgb, var(--aether-2) 32%, transparent);
+    color: #fff;
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+  .pviz .status {
+    flex: none;
+  }
+  .pviz-row.stacked {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .small {
+    margin: 4px 0 0;
+  }
+  @media (max-width: 960px) {
+    .pgrid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* about teaser */
+  .about-teaser {
+    background: radial-gradient(70% 60% at 20% 30%, rgba(255, 170, 80, 0.12), transparent 70%), #0d0a08;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+  }
+  .about-photo {
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    box-shadow: var(--shadow);
+  }
+  .about-photo :global(img) {
+    width: 100%;
+    height: 118%;
+    object-fit: cover;
+    object-position: 30% 40%;
+  }
+  .about-copy .lead {
+    margin: 22px 0 30px;
+  }
+  @media (max-width: 860px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+    .about-photo {
+      aspect-ratio: 4 / 4.4;
+    }
+  }
+
+  /* writing & certificates */
+  .row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 20px;
+    margin-bottom: clamp(32px, 5vw, 56px);
+  }
+  .medium-empty {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .medium-empty p {
+    margin: 0;
+    max-width: 58ch;
+    color: var(--muted);
+  }
+  .medium-empty strong {
+    color: var(--ink);
+  }
+  .certs {
+    padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .cert-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .cert {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    gap: 12px;
+    min-height: 220px;
+    align-content: start;
+    text-decoration: none;
+    transition: transform 0.5s var(--ease);
+  }
+  .cert:hover {
+    transform: translateY(-4px);
+  }
+  .cert-glow {
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    right: -60px;
+    top: -60px;
+    border-radius: 50%;
+    background: var(--hue);
+    filter: blur(60px);
+    opacity: 0.35;
+  }
+  .cert .h3 {
+    position: relative;
+    max-width: 14ch;
+  }
+  .cert-open {
+    position: relative;
+    margin-top: auto;
+    color: var(--accent);
+    font-weight: 560;
+  }
+  @media (max-width: 860px) {
+    .cert-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

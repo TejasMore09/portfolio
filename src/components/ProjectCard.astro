@@ -1,0 +1,160 @@
+---
+// Sneak-peek card for a project. On wide screens the cards stick and stack as you scroll;
+// the screenshot morphs into the project page's hero (shared view-transition name).
+import BrowserFrame from './BrowserFrame.astro';
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+  index: number;
+  stack?: boolean;
+}
+const { project: p, index, stack = false } = Astro.props;
+---
+<article
+  class={`pcard pcard-${p.slug}`}
+  data-theme={p.theme}
+  data-stack-card={stack ? '' : undefined}
+  style={`--i: ${index}; --g1: var(--${p.slug}); --g2: var(--${p.slug}-2)`}>
+  <div class="pcard-inner">
+    <div class="pcard-text">
+      <p class="label">0{index + 1} · {p.period}</p>
+      <h3 class="pcard-name">{p.name}</h3>
+      <p class="pcard-tag gradient-text">{p.tagline}.</p>
+      <p class="pcard-problem">{p.problem}</p>
+      <dl class="pcard-stats">
+        {
+          p.cardStats.map((s) => (
+            <div>
+              <dt>{s.value}</dt>
+              <dd>{s.label}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="cta-row">
+        <a class="btn btn-primary" href={p.caseStudy}>Read the case study <span class="arrow">→</span></a>
+        <a class="btn btn-ghost" href={p.live.url} target="_blank" rel="noopener">{p.live.label} ↗</a>
+      </div>
+    </div>
+    <a class="pcard-media" href={p.caseStudy} data-cursor="View" data-tilt aria-label={`${p.name} case study`}>
+      <BrowserFrame
+        image={p.cover}
+        alt={p.coverAlt}
+        url={p.live.url}
+        vt={`shot-${p.slug}`}
+        ratio="16 / 11"
+        position={p.coverPosition}
+        sizes="(max-width: 860px) 92vw, 520px"
+        dark={p.theme === 'dark'}
+      />
+    </a>
+  </div>
+</article>
+
+<style>
+  .pcard {
+    position: sticky;
+    top: calc(var(--nav-h) + 28px + var(--i) * 16px);
+    background: none;
+  }
+  .pcard-inner {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--r-xl);
+    min-height: min(80vh, 760px);
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: center;
+    padding: clamp(28px, 4.6vw, 64px);
+    background: var(--card-bg);
+    box-shadow: 0 0 0 1px var(--rule);
+    transform-origin: 50% 0;
+    will-change: transform;
+  }
+  .pcard-aether {
+    --card-bg: radial-gradient(90% 70% at 88% 8%, rgba(255, 122, 47, 0.34), transparent 62%),
+      radial-gradient(60% 60% at 10% 100%, rgba(255, 181, 71, 0.14), transparent 70%), #110c09;
+  }
+  .pcard-darkhorse {
+    --card-bg: radial-gradient(90% 70% at 90% 0%, rgba(255, 77, 94, 0.2), transparent 60%),
+      radial-gradient(70% 70% at 0% 100%, rgba(255, 154, 139, 0.18), transparent 70%), #fff7f6;
+  }
+  .pcard-fintrust {
+    --card-bg: radial-gradient(90% 70% at 90% 0%, rgba(19, 196, 143, 0.2), transparent 60%),
+      radial-gradient(70% 70% at 0% 100%, rgba(79, 209, 255, 0.16), transparent 70%), #f2fbf7;
+  }
+  .pcard-text {
+    position: relative;
+  }
+  .pcard-name {
+    font-size: clamp(2.4rem, 5vw, 4.4rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    font-weight: 680;
+    margin: 14px 0 10px;
+  }
+  .pcard-tag {
+    font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+    font-weight: 620;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin: 0 0 14px;
+  }
+  .pcard-problem {
+    color: var(--muted);
+    font-size: 1.02rem;
+    max-width: 38ch;
+  }
+  .pcard-stats {
+    display: flex;
+    gap: clamp(20px, 3vw, 44px);
+    margin: 24px 0 30px;
+  }
+  .pcard-stats dt {
+    font-family: var(--mono);
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .pcard-stats dd {
+    margin: 4px 0 0;
+    font-size: 0.86rem;
+    color: var(--muted);
+    max-width: 18ch;
+  }
+  .pcard-media {
+    display: block;
+    position: relative;
+    border-radius: 16px;
+    text-decoration: none;
+  }
+  .pcard-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    pointer-events: none;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, 0.22), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .pcard-media:hover::after {
+    opacity: 1;
+  }
+  @media (max-width: 900px) {
+    .pcard {
+      position: relative;
+      top: 0;
+    }
+    .pcard-inner {
+      grid-template-columns: 1fr;
+      min-height: 0;
+    }
+    .pcard-media {
+      order: -1;
+    }
+  }
+</style>

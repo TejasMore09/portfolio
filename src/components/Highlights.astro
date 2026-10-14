@@ -1,0 +1,172 @@
+---
+// "Get the highlights": a swipeable gallery of product screens with captions, on a dark stage.
+import { Image } from 'astro:assets';
+import type { Highlight } from '../data/projects';
+
+interface Props {
+  items: Highlight[];
+  hue: string; // project slug, for the accent colours
+  title?: string;
+}
+const { items, hue, title = 'Get the highlights.' } = Astro.props;
+const widthsFor = (w: number) => [...[520, 860, 1200, 1760].filter((x) => x < w), Math.min(w, 1760)];
+// Cards are 880px wide, or as wide as a smaller screenshot was captured, so nothing is upscaled.
+const cardWidth = (h: Highlight) => (h.phone ? undefined : `--w: ${Math.min(h.image.width, 880)}px`);
+---
+<section class="section hl dark grain" data-theme="dark" style={`--g1: var(--${hue}); --g2: var(--${hue}-2)`}>
+  <div class="container hl-head">
+    <h2 class="h2" data-split>{title}</h2>
+    <div class="hl-nav">
+      <button type="button" class="hl-btn" data-hl-prev aria-label="Previous highlight">←</button>
+      <button type="button" class="hl-btn" data-hl-next aria-label="Next highlight">→</button>
+    </div>
+  </div>
+  <div class="hl-track" data-hl-track tabindex="0" aria-label={title}>
+    {
+      items.map((h) => (
+        <figure class:list={['hl-card', { 'hl-phone': h.phone }]} style={cardWidth(h)} data-cursor="Drag">
+          <div class="hl-media">
+            <Image
+              src={h.image}
+              alt={h.title}
+              widths={widthsFor(h.image.width)}
+              sizes={h.phone ? '320px' : `(max-width: 700px) 86vw, ${Math.min(h.image.width, 880)}px`}
+              loading="lazy"
+              draggable="false"
+            />
+          </div>
+          <figcaption>
+            <strong>{h.title}</strong> {h.caption}
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  for (const section of document.querySelectorAll<HTMLElement>('.hl')) {
+    const track = section.querySelector<HTMLElement>('[data-hl-track]')!;
+    const step = () => (track.querySelector<HTMLElement>('.hl-card')?.offsetWidth ?? 600) + 24;
+    section.querySelector('[data-hl-prev]')?.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    section.querySelector('[data-hl-next]')?.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    // Mouse drag-to-scroll (touch and trackpads scroll natively).
+    let dragging = false;
+    let startX = 0;
+    let startLeft = 0;
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      dragging = true;
+      startX = e.clientX;
+      startLeft = track.scrollLeft;
+      track.classList.add('is-dragging');
+    });
+    addEventListener('pointermove', (e) => {
+      if (dragging) track.scrollLeft = startLeft - (e.clientX - startX);
+    });
+    addEventListener('pointerup', () => {
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove('is-dragging');
+    });
+  }
+</script>
+
+<style>
+  .hl {
+    background: #000;
+  }
+  .hl-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: clamp(32px, 5vw, 56px);
+  }
+  .hl-nav {
+    display: flex;
+    gap: 10px;
+  }
+  .hl-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 0;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+    transition: background-color 0.3s;
+  }
+  .hl-btn:hover {
+    background: color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+  .hl-track {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter)));
+    scroll-padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter)));
+    padding-bottom: 8px;
+  }
+  .hl-track::-webkit-scrollbar {
+    display: none;
+  }
+  .hl-track.is-dragging {
+    scroll-snap-type: none;
+    cursor: grabbing;
+    user-select: none;
+  }
+  .hl-track img {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+  .hl-card {
+    flex: 0 0 min(var(--w, 880px), 86vw);
+    margin: 0;
+    scroll-snap-align: start;
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    background: #141416;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  .hl-media {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: radial-gradient(80% 90% at 50% 0%, color-mix(in srgb, var(--g1) 30%, transparent), transparent 70%), #0d0d0f;
+  }
+  .hl-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+  .hl-phone .hl-media {
+    display: grid;
+    place-items: center;
+    padding: 28px;
+  }
+  .hl-phone .hl-media img {
+    width: auto;
+    height: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 28px;
+    box-shadow:
+      0 0 0 8px #1f1f22,
+      0 30px 60px -20px rgba(0, 0, 0, 0.8);
+  }
+  figcaption {
+    padding: 22px 28px 26px;
+    color: var(--muted);
+    font-size: 1.02rem;
+    line-height: 1.5;
+    max-width: 62ch;
+  }
+  figcaption strong {
+    color: var(--ink);
+    font-weight: 620;
+  }
+</style>

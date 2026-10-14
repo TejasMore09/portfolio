@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+---
+<Base title="Page not found · Tejas More" description="This page doesn't exist.">
+  <PageHero eyebrow="404" title="This page doesn’t exist." lead="But these do." hues={['var(--darkhorse)', 'var(--aether)']}>
+    <div class="cta-row links">
+      <a class="btn btn-primary" href="/">Home</a>
+      <a class="btn btn-ghost" href="/work">Work</a>
+      <a class="btn btn-ghost" href="/about">About</a>
+    </div>
+  </PageHero>
+</Base>
+
+<style>
+  .links {
+    margin-top: 32px;
+    padding-bottom: 80px;
+  }
+</style>

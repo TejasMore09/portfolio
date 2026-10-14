@@ -1,0 +1,147 @@
+---
+// Signature element: an Apple-style headline number that opens to show how it was measured.
+import type { Metric } from '../data/projects';
+
+interface Props {
+  metric: Metric;
+}
+const { metric } = Astro.props;
+const c = metric.count;
+const dev = import.meta.env.DEV;
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const method = esc(metric.method).replace(/`([^`]+)`/g, '<code>$1</code>');
+const long = metric.value.length > 6; // e.g. "$0.00048", "12 of 25": step the size down so it fits the column
+---
+<details class="stat">
+  <summary>
+    <span
+      class:list={['stat-value', { long }]}
+      data-count={c?.to}
+      data-decimals={c?.decimals}
+      data-prefix={c?.prefix}
+      data-suffix={c?.suffix}>{metric.value}</span
+    >
+    <span class="stat-label">{metric.label}</span>
+    {metric.context && <span class="stat-context">{metric.context}</span>}
+    <span class="stat-how"><span class="plus" aria-hidden="true"></span>How it’s measured</span>
+  </summary>
+  <div class="stat-evidence">
+    <p set:html={method} />
+    {
+      metric.source && (
+        <a class="link" href={metric.source} target="_blank" rel="noopener">
+          See it in the live product ↗
+        </a>
+      )
+    }
+    {
+      (metric.verified || dev) && (
+        <p class="stat-verified">
+          Last verified{' '}
+          {metric.verified ?? <span class="unavailable">UNAVAILABLE</span>}
+        </p>
+      )
+    }
+  </div>
+</details>
+
+<style>
+  .stat {
+    border-top: 1px solid var(--rule);
+    padding-top: 22px;
+  }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .stat-value {
+    font-size: clamp(2.8rem, 5.6vw, 5rem);
+    line-height: 1;
+    font-weight: 660;
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(95deg, var(--g1, var(--ink)), var(--g2, var(--ink)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    padding-bottom: 0.06em;
+  }
+  .stat-value.long {
+    font-size: clamp(2.3rem, 4vw, 3.6rem);
+  }
+  .stat-label {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    max-width: 22ch;
+  }
+  .stat-context {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .stat-how {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.86rem;
+    font-weight: 560;
+    color: var(--accent);
+  }
+  .plus {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1.5px currentColor;
+  }
+  .plus::before,
+  .plus::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 1.5px;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+    transition: transform 0.4s var(--ease);
+  }
+  .plus::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  details[open] .plus::after {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 8px;
+  }
+  .stat-evidence {
+    margin-top: 14px;
+    padding: 16px 18px;
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .stat-evidence p {
+    margin: 0 0 10px;
+  }
+  .stat-verified {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+</style>

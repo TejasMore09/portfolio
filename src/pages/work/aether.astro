@@ -1,0 +1,190 @@
+---
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import Flow from '../../components/Flow.astro';
+import Shot from '../../components/Shot.astro';
+import { projects } from '../../data/projects';
+import { aetherFlow } from '../../data/diagrams';
+import trend from '../../assets/projects/aether/fig-trend.png';
+import staffTrail from '../../assets/projects/aether/fig-staff-trail.png';
+
+const p = projects.find((x) => x.slug === 'aether')!;
+---
+<ProjectLayout
+  project={p}
+  title="Aether — an AI agent that decides whether acting is worth the money · Tejas More"
+  facts={[
+    { label: 'Role', value: 'Solo — product, decision engine, backend, frontend, ops' },
+    { label: 'For', value: 'Small businesses without a finance team' },
+    { label: 'Watches', value: 'Receivables, cash runway, payables, inventory, customer risk' },
+    { label: 'Data', value: 'Typed, spreadsheets, API keys, Xero via OAuth 2.0 + PKCE' },
+  ]}>
+  <section class="chapter">
+    <p class="kicker">01 — The problem</p>
+    <h2 data-split>A small business runs on numbers it cannot read.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        Large enterprises buy Palantir: a system that ingests everything a company does and surfaces what matters before a
+        human would notice — for seven figures and a team of forward-deployed engineers. Everyone below that line gets a
+        dashboard. A dashboard is a mirror: it shows numbers you already had, arranged more neatly, and leaves the hard part —
+        <em>is this bad, how bad, what do I do about it</em> — exactly where it was.
+      </p>
+      <p>
+        The gap isn’t visualisation. It’s <strong>judgement</strong>: a band to compare against, an economic model to size
+        the loss, a view across functions, and the discipline to stay quiet when nothing is worth saying.
+      </p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">02 — How it works</p>
+    <h2 data-split>Five steps, the same for every domain.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        Every business gets its own isolated agent. Readings arrive however the business has them, pass a quality gate, become
+        two signals — <strong>performance</strong> (how healthy, against the band) and <strong>drift</strong> (how much it moved,
+        against this business’s own baseline) — and then face a risk score and an economic test. High-risk actions wait for
+        the owner. Only then does a model write the explanation.
+      </p>
+    </div>
+    <Flow diagram={aetherFlow} />
+    <div class="tiles" data-stagger>
+      <div class="tile"><span class="label">Economically gated</span><h3>Acting has to pay</h3><p>A verdict carries an expected daily loss and a one-off cost to act. If the fix doesn’t pay back inside the pack’s horizon, the engine recommends nothing.</p></div>
+      <div class="tile"><span class="label">Calibrated per tenant</span><h3>Its own normal</h3><p>After ten readings the band becomes this business’s own normal — within anchored limits, so a chronically bad book can’t normalise itself into “healthy”.</p></div>
+      <div class="tile"><span class="label">Business-level</span><h3>One view across functions</h3><p>Findings can name several domains at once with one combined exposure, and suppress the single-domain findings they subsume.</p></div>
+      <div class="tile"><span class="label">Honest when uncertain</span><h3>No confident guesses</h3><p>Bad readings are quarantined and shown. A stalled connector is named. If every source has stopped, it refuses to report a verdict at all.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">03 — The economic test</p>
+    <div class="callout" data-reveal>
+      <h3>It will not spend a business’s money to save less of it.</h3>
+      <pre class="formula">expected_daily_loss = exposure × at_risk_share × daily_rate
+                    = 2,846,000 × 34% × 0.0004/day       = $387.06 a day
+
+payback_days        = intervention_cost / expected_daily_loss
+                    = 400.00 / 387.06                    = 1.0 days  →  <span class="ok">act, and gate it</span>
+
+receivables payback horizon: 7 days
+
+same test, a $284,600 book:  $38.71 a day  →  10.3 days  →  <span class="no">flag for review, no action</span></pre>
+      <p>
+        Acting costs a one-off sum while the loss accrues daily, so the two only compare across a horizon — per pack,
+        overridable per tenant, and written down rather than hidden in a constant. Some metrics are <em>existential</em>:
+        payroll cover skips the test entirely, because a business that can’t make payroll is not a cost-benefit calculation.
+      </p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">04 — Performance versus drift</p>
+    <h2 data-split>Two different questions, kept separate on purpose.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        A book that has been 40% overdue for two years is not drifting — and is very much a problem. A book that moved from
+        14% to 34% in five weeks is drifting hard, and is a different problem. Collapsing them into one number loses both.
+      </p>
+      <p>
+        Risk combines the two with pack-set weights, then a <strong>severity bias</strong> raises it when a single metric is
+        deep in its critical zone — so a business can’t look fine on aggregate while one thing is on fire.
+      </p>
+    </div>
+    <Shot
+      image={trend}
+      density={2}
+      alt="Aether walk-through trend: five weekly readings; days sales outstanding 46 to 71, overdue share 14% to 34%, book health 88% to 31%."
+      caption="From the public walk-through: five weekly readings in which the overdue share climbs from 14% to 34% while book health falls from 88% to 31%."
+    />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">05 — What an agent remembers</p>
+    <h2 data-split>The owner’s own decisions — quoted only when two signals agree.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        Each agent remembers approvals, rejections and the reasons given, in plain sentences, under the same row-level policy
+        as everything else. Embeddings are computed <strong>locally</strong> by a small ONNX model — no text leaves the
+        deployment to be vectorised, and there’s no paid API in the path.
+      </p>
+      <p>
+        Retrieval is hybrid: vector similarity plus a keyword signal, and a past decision is only quoted when <strong>both
+        signals agree</strong>. Requiring that agreement raised cross-action recall from 0.22 to 0.56 with zero spurious quotes.
+        Writing a memory without a working embedding model fails loudly rather than storing something unsearchable.
+      </p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">06 — Tenant isolation</p>
+    <h2 data-split>Proved, not asserted.</h2>
+    <div class="tiles" data-stagger>
+      <div class="tile"><span class="label">Fails loudly</span><h3>No silent empty lists</h3><p>The policy reads the tenant setting strictly: if a code path forgets to set it, the query raises instead of quietly matching zero rows.</p></div>
+      <div class="tile"><span class="label">No app-level filter</span><h3>The database does it</h3><p>No Python filters by tenant — a redundant <code>WHERE</code> would let the isolation tests pass with the policy dropped.</p></div>
+      <div class="tile"><span class="label">Concurrent</span><h3>Tested like production</h3><p>Many tenants share a pool at once, including a query whose nearest vector neighbour belongs to somebody else.</p></div>
+      <div class="tile"><span class="label">A trade-off, kept</span><h3>Exact scan over speed</h3><p>Under row-level security an approximate index can return nothing for a small tenant — measured, recorded, and the exact scan kept on purpose.</p></div>
+    </div>
+    <Shot
+      image={staffTrail}
+      density={2}
+      dark
+      alt="Aether operator console, Staff trail: staff logins, fault reads and break-glass opens and reads, each break-glass entry with its reason."
+      caption="The operator console’s staff trail: every staff action, reads included — append-only, enforced by a database trigger."
+    />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">07 — Real data, end to end</p>
+    <h2 data-split>A real accounting system, read and turned into a verdict.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        Xero over OAuth 2.0 with PKCE, a refresh token the platform seals itself, parsed, quality-gated, filed — and turned into
+        a verdict by the scheduled sweep. The figures matched the live dashboard exactly.
+      </p>
+    </div>
+    <div class="callout" data-reveal>
+      <pre class="formula">status=accepted  source=connector
+  ar_total            9194.51
+  dso_days            20.5
+  overdue_ratio       0.7555
+  top5_concentration  0.9746
+
+verdict: <span class="ok">MONITOR MEDIUM</span>   triggered_by=nano-monitor:receivables</pre>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">08 — What didn’t work</p>
+    <h2 data-split>Seven defects that only running it could find.</h2>
+    <div class="prose" data-reveal>
+      <p>Every test was green. Each of these was invisible until the system actually ran somewhere it wasn’t written:</p>
+    </div>
+    <ol class="defects" data-stagger>
+      <li><div><strong>The scheduled sweep had never once succeeded.</strong><p>The repository had no Actions secrets; the deploy guard correctly refused to start — four failures, unnoticed, because a sweep that never ran looked like a quiet fleet.</p></div></li>
+      <li><div><strong>The watchdog was deployed nowhere.</strong><p>It rode on a worker process; the hosting blueprint had three web services and no worker.</p></div></li>
+      <li><div><strong>The free tier blocks SMTP ports.</strong><p>Only sending found it. Email now goes through an HTTP API, on the server and in CI alike.</p></div></li>
+      <li><div><strong>A base URL pointed at a stranger’s website.</strong><p>The obvious <code>aether.vercel.app</code> belongs to somebody else — Xero refused the redirect, and the same variable built password-reset links.</p></div></li>
+      <li><div><strong>Xero had deprecated the scope the code asked for.</strong><p>Every new app since March 2026 gets only granular scopes.</p></div></li>
+      <li><div><strong>The report the connector read doesn’t exist in that shape.</strong><p>Twenty-seven tests passed against it — the fixtures were built from the same misreading as the parser.</p></div></li>
+      <li><div><strong>A metric the pack requires was never produced.</strong><p>Every Xero reading would have been quarantined as incomplete, whatever came back.</p></div></li>
+    </ol>
+    <blockquote data-reveal>An integration nobody has run is a guess with tests around it.</blockquote>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">09 — Operations</p>
+    <h2 data-split>Running unattended.</h2>
+    <div class="numbers" data-stagger>
+      <div><b>1,323</b><span>tests, none skipped</span></div>
+      <div><b>4</b><span>services, deployed</span></div>
+      <div><b>114</b><span>decisions logged in writing</span></div>
+      <div><b>2.11 min</b><span>measured rollback drill, both directions</span></div>
+    </div>
+    <div class="prose" data-reveal>
+      <p>
+        AES-256 daily backups, proven by actually decrypting and restoring one. The model is metered per tenant with a
+        deterministic template fallback, so running out of AI budget degrades the wording and nothing else. Next: one real
+        business and twelve months of real figures — the only way to turn published bands into observed ones.
+      </p>
+    </div>
+  </section>
+</ProjectLayout>

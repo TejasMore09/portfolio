@@ -1,0 +1,147 @@
+---
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import Flow from '../../components/Flow.astro';
+import Shot from '../../components/Shot.astro';
+import { projects } from '../../data/projects';
+import { fintrustFlow } from '../../data/diagrams';
+import explained from '../../assets/projects/fintrust/fig-explained.jpg';
+import notInDocuments from '../../assets/projects/fintrust/fig-not-in-documents.jpg';
+import deadlines from '../../assets/projects/fintrust/fig-deadlines.jpg';
+
+const p = projects.find((x) => x.slug === 'fintrust')!;
+---
+<ProjectLayout
+  project={p}
+  title="Fintrust — regulation explained, every line sourced · Tejas More"
+  facts={[
+    { label: 'Role', value: 'Solo — product, retrieval, backend, frontend, infra' },
+    { label: 'For', value: 'SEBI investment advisers & research analysts, NBFC compliance' },
+    { label: 'Corpus', value: '7 RBI/SEBI documents · 267 pages · 703 sections' },
+    { label: 'Answers', value: 'Cited to page and paragraph, in 2–5 seconds' },
+  ]}>
+  <section class="chapter">
+    <p class="kicker">01 — The problem</p>
+    <h2 data-split>Compliance means acting on 99-page circulars. Nobody has time to read them.</h2>
+    <div class="tiles" data-stagger>
+      <div class="tile"><span class="label">1</span><h3>The rules arrive as long PDFs</h3><p>And the person who must follow them has a day job.</p></div>
+      <div class="tile"><span class="label">2</span><h3>Most of it doesn’t apply to you</h3><p>You can’t tell which parts without reading all of it.</p></div>
+      <div class="tile"><span class="label">3</span><h3>An unchecked AI statement is worse than none</h3><p>A fluent summary that’s wrong is a liability in compliance.</p></div>
+      <div class="tile"><span class="label">4</span><h3>Obligations hide in prose</h3><p>And deadlines hide inside obligations.</p></div>
+      <div class="tile"><span class="label">5</span><h3>Old rules are replaced, not deleted</h3><p>What changed matters as much as what’s new.</p></div>
+      <div class="tile"><span class="label">6</span><h3>The advice line is a legal line</h3><p>Explaining regulation must never become investment advice.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">02 — How it works</p>
+    <h2 data-split>Two paths, one database, a check after every model call.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        Ingestion runs offline: the documents are stored as immutable text, explained and mined for obligations, then checked.
+        Questions run live: an advice check, hybrid retrieval in a single SQL query, a relevance gate, the model — and quote
+        verification before anything reaches the screen. Postgres holds everything, including the vectors, so retrieval is a
+        join and there’s no second store to keep in sync.
+      </p>
+    </div>
+    <Flow diagram={fintrustFlow} />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">03 — Grounding</p>
+    <div class="callout" data-reveal>
+      <h3>How a statement earns its place on screen.</h3>
+      <pre class="formula">the model must quote      "...not later than 21 days of the receipt of the grievance"
+code finds the quote      at a character span in the immutable version text
+each task adds checks     a deadline must appear inside its own quote
+stored either way         <span class="ok">shown only if supported</span>
+
+explanations of the 7 documents:  179 statements  →  <span class="ok">177 shown</span>  ·  <span class="no">2 withheld (quote not found)</span></pre>
+      <p>
+        Click any statement and the regulator’s own sentence lights up in the source. Spans point into immutable text, so a
+        citation can never drift when a document is re-parsed — a section label can be wrong; the citation itself cannot.
+      </p>
+    </div>
+    <Shot
+      image={explained}
+      alt="Fintrust explanation of the Master Circular for Investment Advisers, with numbered citations beside each sentence and the cited passages highlighted in the source text."
+      caption="Every sentence of an explanation carries a numbered citation, and the passages it cites are highlighted in the regulator’s text."
+    />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">04 — The life of a question</p>
+    <h2 data-split>“The documents don’t say” is a feature.</h2>
+    <div class="numbers" data-stagger>
+      <div><b>40 + 40</b><span>vector and keyword candidates</span></div>
+      <div><b>k = 60</b><span>reciprocal rank fusion</span></div>
+      <div><b>12</b><span>passages to the model</span></div>
+      <div><b>0.32</b><span>relevance gate</span></div>
+    </div>
+    <div class="prose" data-reveal>
+      <p>
+        “Should I buy Reliance shares now?” never costs a model call — a narrow pattern check declines advice before
+        retrieval, and the model’s own flag declines it again if anything slips through. “What is the capital of France?”
+        fails the relevance gate and gets “not in the documents” instead of a confident guess.
+      </p>
+    </div>
+    <Shot
+      image={notInDocuments}
+      alt="Fintrust answering “What is the capital of France?” with “The documents don’t say”."
+      caption="An off-topic question gets no confident guess — just “The documents don’t say”, and how to ask in the regulator’s words."
+    />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">05 — Deadlines</p>
+    <h2 data-split>From a sentence to a date, without the model doing arithmetic.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        The model extracts obligations as cited records. Code checks that each deadline actually appears inside its own quote,
+        and a deterministic generator turns them into <strong>132 dated deadlines</strong>, from three months back to two years
+        ahead, on a board a compliance officer can actually open.
+      </p>
+    </div>
+    <Shot
+      image={deadlines}
+      alt="Fintrust deadline board: 5 overdue, 3 due in the next 30 days, 1 dealt with, next due 30 Oct 2026."
+      caption="The board: overdue, due in the next 30 days, later and dealt with — every card links back to its source."
+    />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">06 — What it taught</p>
+    <h2 data-split>Defects no single test would have shown.</h2>
+    <ol class="defects" data-stagger>
+      <li><div><strong>Anyone could stall the whole API.</strong><p>Sign-in held one pooled connection while recording on a second; ten parallel failed sign-ins took all ten and deadlocked until timeout. Rule since: never await a second pooled connection while holding one.</p></div></li>
+      <li><div><strong>Rate limits that only held one request at a time.</strong><p>Count-then-record let parallel requests through. Now admitted and recorded in one transaction under an advisory lock — proved with parallel requests.</p></div></li>
+      <li><div><strong>TLS that would have failed on launch day.</strong><p>Found by rehearsing the production database connection, not just the production code.</p></div></li>
+      <li><div><strong>A security test that passed because it tested nothing.</strong><p>It walked the routes, found none (they were nested), and passed. A security test should fail when its input is empty.</p></div></li>
+      <li><div><strong>Found by photographing the product.</strong><p>Searching the library for “grievance” found nothing — search only read titles. It now searches the documents’ text.</p></div></li>
+      <li><div><strong>Half a deploy.</strong><p>The web half went live and the API half didn’t. Check the live release, not the CI badge.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">07 — What isn’t finished</p>
+    <h2 data-split>Honest limitations.</h2>
+    <div class="prose" data-reveal>
+      <ul>
+        <li><strong>Seven documents.</strong> Enough to prove the method; a real user needs every current circular for their registration.</li>
+        <li><strong>Verified isn’t reviewed.</strong> A statement can quote the source accurately and still miss context; the human review queue isn’t built yet.</li>
+        <li><strong>Extraction recall varies between runs</strong> (35 vs 22 obligations on the same circular) — every one kept was verified, which is why production loads a verified snapshot.</li>
+        <li><strong>Tenant isolation is in the application’s queries,</strong> not yet in Postgres row-level security.</li>
+        <li><strong>Free tiers:</strong> a sleeping API, one region, no staging, and one model vendor.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">08 — Built to be checked</p>
+    <h2 data-split>The unglamorous parts.</h2>
+    <div class="numbers" data-stagger>
+      <div><b>225</b><span>tests against a real Postgres</span></div>
+      <div><b>WCAG 2.1 AA</b><span>on every page</span></div>
+      <div><b>100%</b><span>of AI calls logged — model, prompt version, tokens, latency</span></div>
+    </div>
+  </section>
+</ProjectLayout>

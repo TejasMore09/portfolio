@@ -1,0 +1,49 @@
+---
+// Header for inner pages: eyebrow, big title, lead, on a softly lit background.
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  theme?: 'light' | 'dark';
+  hues?: [string, string];
+}
+const { eyebrow, title, lead, theme = 'light', hues = ['var(--blue)', 'var(--fintrust)'] } = Astro.props;
+---
+<section class:list={['page-hero', { grain: theme === 'dark' }]} data-theme={theme} style={`--g1: ${hues[0]}; --g2: ${hues[1]}`}>
+  <div class="glow h1g" aria-hidden="true"></div>
+  <div class="glow h2g" aria-hidden="true"></div>
+  <div class="container intro">
+    <p class="eyebrow gradient-text">{eyebrow}</p>
+    <h1 class="display">{title}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: clip;
+    padding: calc(var(--nav-h) + clamp(72px, 12vw, 150px)) 0 clamp(56px, 8vw, 96px);
+  }
+  .h1g {
+    width: 42vw;
+    height: 42vw;
+    right: -10vw;
+    top: -18vw;
+    background: var(--g1);
+    opacity: 0.22;
+  }
+  .h2g {
+    width: 30vw;
+    height: 30vw;
+    right: 22vw;
+    top: -12vw;
+    background: var(--g2);
+    opacity: 0.18;
+  }
+  .lead {
+    margin-top: 26px;
+    max-width: 40rem;
+  }
+</style>
