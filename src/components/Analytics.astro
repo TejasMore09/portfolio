@@ -1,0 +1,12 @@
+---
+// Vercel Web Analytics: cookie-free visitor counts. The package's own Astro component reports the
+// build-time file name (/work/aether.html); plain inject() reports the address visitors actually see.
+---
+<script>
+  import { inject } from '@vercel/analytics';
+
+  inject(
+    { framework: 'astro', basePath: import.meta.env.PUBLIC_VERCEL_OBSERVABILITY_BASEPATH },
+    import.meta.env.PUBLIC_VERCEL_OBSERVABILITY_CLIENT_CONFIG,
+  );
+</script>
