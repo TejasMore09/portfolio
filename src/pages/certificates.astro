@@ -15,7 +15,7 @@ import { certificates } from '../data/certificates';
     <div class="container grid" data-stagger>
       {
         certificates.map((c) => (
-          <a class="cert" href={c.url} target="_blank" rel="noopener" style={`--hue: ${c.hue}`} data-cursor="Open" data-tilt>
+          <a class="cert" href={c.url} target="_blank" rel="noopener" style={`--hue: ${c.hue}`} data-tilt>
             <div class="paper">
               <Image src={c.image} alt={`${c.title} certificate, ${c.issuer}`} widths={[480, 760, 1024]} sizes="(max-width: 900px) 90vw, 380px" />
             </div>

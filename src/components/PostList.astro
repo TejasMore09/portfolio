@@ -19,13 +19,13 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', dateOpts)
     {
       posts.map((p) =>
         variant === 'cards' ? (
-          <a class="post card" href={p.url} target="_blank" rel="noopener" data-cursor="Read">
+          <a class="post card" href={p.url} target="_blank" rel="noopener">
             <span class="label"><span data-date>{fmt(p.date)}</span> · <span data-minutes>{p.minutes}</span> min</span>
             <h3 class="h3" data-title>{p.title}</h3>
             <p data-excerpt>{p.excerpt}</p>
           </a>
         ) : (
-          <a class="row" href={p.url} target="_blank" rel="noopener" data-cursor="Read">
+          <a class="row" href={p.url} target="_blank" rel="noopener">
             {p.image && <img data-image src={p.image} alt="" loading="lazy" decoding="async" />}
             <div>
               <span class="label"><span data-date>{fmt(p.date)}</span> · <span data-minutes>{p.minutes}</span> min read</span>
@@ -42,13 +42,13 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', dateOpts)
   <template data-post-template>
     {
       variant === 'cards' ? (
-        <a class="post card" target="_blank" rel="noopener" data-cursor="Read">
+        <a class="post card" target="_blank" rel="noopener">
           <span class="label"><span data-date /> · <span data-minutes /> min</span>
           <h3 class="h3" data-title />
           <p data-excerpt />
         </a>
       ) : (
-        <a class="row" target="_blank" rel="noopener" data-cursor="Read">
+        <a class="row" target="_blank" rel="noopener">
           <img data-image alt="" loading="lazy" decoding="async" />
           <div>
             <span class="label"><span data-date /> · <span data-minutes /> min read</span>
