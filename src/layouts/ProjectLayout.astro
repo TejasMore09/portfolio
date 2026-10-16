@@ -109,7 +109,7 @@ const heroMax = p.cover.width < 1100 ? Math.round(p.cover.width * 1.2) : undefin
 
   <section class="next-wrap" data-theme="light">
     <div class="container">
-      <a class={`next-card next-${next.slug}`} href={next.caseStudy} data-theme={next.theme} data-cursor="Next" style={`--g1: var(--${next.slug}); --g2: var(--${next.slug}-2)`}>
+      <a class={`next-card next-${next.slug}`} href={next.caseStudy} data-theme={next.theme} style={`--g1: var(--${next.slug}); --g2: var(--${next.slug}-2)`}>
         <span class="label">Next case study</span>
         <span class="next-name">{next.name}</span>
         <span class="next-tag gradient-text">{next.tagline}.</span>
@@ -222,7 +222,7 @@ const heroMax = p.cover.width < 1100 ? Math.round(p.cover.width * 1.2) : undefin
     color: var(--ink);
   }
   .case {
-    padding-block: clamp(32px, 6vw, 80px) clamp(64px, 10vw, 120px);
+    padding-block: clamp(32px, 6vw, 80px) clamp(24px, 4vw, 48px);
   }
   .next-wrap {
     padding: 0 0 clamp(64px, 9vw, 120px);

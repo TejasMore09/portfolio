@@ -1,9 +1,8 @@
 ---
-// Custom cursor: a dot and a trailing ring. The ring grows over links and shows a word
-// ("View", "Drag"…) over elements with data-cursor. Desktop pointers only.
+// Custom cursor: a dot and a trailing ring that grows over links. Desktop pointers only.
 ---
 <div class="cursor" data-cursor-root aria-hidden="true">
-  <div class="cursor-ring"><span class="cursor-label"></span></div>
+  <div class="cursor-ring"></div>
   <div class="cursor-dot"></div>
 </div>
 
@@ -38,8 +37,6 @@
     height: 34px;
     border: 1.5px solid #fff;
     mix-blend-mode: difference;
-    display: grid;
-    place-items: center;
     transition:
       width 0.45s var(--ease),
       height 0.45s var(--ease),
@@ -52,27 +49,8 @@
     height: 56px;
     background: rgba(255, 255, 255, 0.12);
   }
-  .cursor.is-label .cursor-ring {
-    width: 92px;
-    height: 92px;
-    background: #fff;
-    border-color: #fff;
-  }
-  .cursor.is-label .cursor-dot {
-    opacity: 0;
-  }
   .cursor.is-down .cursor-ring {
     width: 26px;
     height: 26px;
-  }
-  .cursor-label {
-    font: 600 0.82rem/1 var(--sans);
-    letter-spacing: -0.01em;
-    color: #000;
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-  .cursor.is-label .cursor-label {
-    opacity: 1;
   }
 </style>

@@ -22,26 +22,36 @@ function smoothScroll() {
   gsap.ticker.lagSmoothing(0);
 }
 
+// Explicit end values (fromTo, not from): a from() re-reads its end state when ScrollTrigger
+// refreshes, and on elements with a CSS transform transition (cards, buttons) it read a value
+// mid-transition and left them stuck part-way down. CSS transitions pause while GSAP moves the
+// element, and the inline transform is cleared afterwards so CSS hover effects work again.
+function reveal(targets: HTMLElement[], trigger: HTMLElement, y: number, start: string, vars: gsap.TweenVars) {
+  gsap.fromTo(
+    targets,
+    { y, autoAlpha: 0 },
+    {
+      y: 0,
+      autoAlpha: 1,
+      ease: 'expo.out',
+      ...vars,
+      scrollTrigger: { trigger, start, once: true },
+      onStart: () => targets.forEach((t) => (t.style.transition = 'none')),
+      onComplete: () =>
+        targets.forEach((t) => {
+          t.style.transition = '';
+          // Tilting elements keep GSAP's transform (it carries their perspective).
+          if (!t.matches('[data-tilt]')) gsap.set(t, { clearProps: 'transform' });
+        }),
+    },
+  );
+}
+
 function reveals() {
   if (reduce) return;
-  for (const el of $$('[data-reveal]')) {
-    gsap.from(el, {
-      y: 40,
-      autoAlpha: 0,
-      duration: 1.3,
-      ease: 'expo.out',
-      scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-    });
-  }
+  for (const el of $$('[data-reveal]')) reveal([el], el, 40, 'top 88%', { duration: 1.3 });
   for (const group of $$('[data-stagger]')) {
-    gsap.from(group.children, {
-      y: 48,
-      autoAlpha: 0,
-      duration: 1.2,
-      ease: 'expo.out',
-      stagger: 0.09,
-      scrollTrigger: { trigger: group, start: 'top 86%', once: true },
-    });
+    reveal([...group.children] as HTMLElement[], group, 48, 'top 86%', { duration: 1.2, stagger: 0.09 });
   }
 }
 
@@ -187,7 +197,6 @@ function cursor() {
   if (!root || !fine) return;
   const dot = root.querySelector<HTMLElement>('.cursor-dot')!;
   const ring = root.querySelector<HTMLElement>('.cursor-ring')!;
-  const label = root.querySelector<HTMLElement>('.cursor-label')!;
   document.documentElement.classList.add('has-cursor');
   gsap.set([dot, ring], { xPercent: -50, yPercent: -50 });
   const fast = { duration: reduce ? 0 : 0.12, ease: 'power3.out' };
@@ -209,11 +218,7 @@ function cursor() {
   );
   document.documentElement.addEventListener('pointerleave', () => root.classList.remove('is-visible'));
   document.addEventListener('pointerover', (e) => {
-    const target = (e.target as Element).closest<HTMLElement>('[data-cursor], a, button, summary, label');
-    const text = target?.dataset.cursor;
-    root.classList.toggle('is-link', !!target && !text);
-    root.classList.toggle('is-label', !!text);
-    label.textContent = text ?? '';
+    root.classList.toggle('is-link', !!(e.target as Element).closest('a, button, summary, label'));
   });
   addEventListener('pointerdown', () => root.classList.add('is-down'));
   addEventListener('pointerup', () => root.classList.remove('is-down'));

@@ -8,7 +8,7 @@ import { site } from '../data/site';
     <p class="label">Let’s talk</p>
     <h2 class="h1 footer-title" data-split>Let’s build AI<br /> that shows its work.</h2>
     <div class="cta-row" data-reveal>
-      <a class="btn btn-big" href={`mailto:${site.email}`} data-magnetic data-cursor="Email">{site.email}</a>
+      <a class="btn btn-big" href={`mailto:${site.email}`} data-magnetic>{site.email}</a>
       {site.resume && <a class="btn btn-ghost" href={site.resume}>Download résumé</a>}
     </div>
     <div class="footer-grid">
@@ -47,7 +47,7 @@ import { site } from '../data/site';
   .footer {
     position: relative;
     overflow: clip;
-    padding: clamp(96px, 14vw, 180px) 0 40px;
+    padding: clamp(72px, 9vw, 128px) 0 40px;
     background: #050507;
   }
   .g1 {

@@ -37,7 +37,7 @@ const { project: p, index, stack = false } = Astro.props;
         <a class="btn btn-ghost" href={p.live.url} target="_blank" rel="noopener">{p.live.label} ↗</a>
       </div>
     </div>
-    <a class="pcard-media" href={p.caseStudy} data-cursor="View" data-tilt aria-label={`${p.name} case study`}>
+    <a class="pcard-media" href={p.caseStudy} data-tilt aria-label={`${p.name} case study`}>
       <BrowserFrame
         image={p.cover}
         alt={p.coverAlt}

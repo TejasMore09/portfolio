@@ -24,7 +24,7 @@ const cardWidth = (h: Highlight) => (h.phone ? undefined : `--w: ${Math.min(h.im
   <div class="hl-track" data-hl-track tabindex="0" aria-label={title}>
     {
       items.map((h) => (
-        <figure class:list={['hl-card', { 'hl-phone': h.phone }]} style={cardWidth(h)} data-cursor="Drag">
+        <figure class:list={['hl-card', { 'hl-phone': h.phone }]} style={cardWidth(h)}>
           <div class="hl-media">
             <Image
               src={h.image}
