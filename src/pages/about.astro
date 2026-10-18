@@ -28,17 +28,17 @@ const principles = [
   { title: 'A number ships with its method.', body: 'DarkHorse publishes its false-positive rate with the count and the command that reproduces it — and withdrew one that didn’t.' },
   { title: 'Unchecked isn’t zero.', body: 'A check that couldn’t run says so. A score of zero from a skipped check looks exactly like a pass.' },
   { title: 'The model is never the last step.', body: 'Quotes are verified against the source; deadlines and decisions are computed by code.' },
-  { title: 'Isolation belongs in the database.', body: 'Row-level security, proved with tests that fail if a policy is dropped.' },
+  { title: 'Isolation belongs in the database.', body: 'In Aether and DarkHorse, row-level security is proved by tests that fail if a policy is dropped. Fintrust still scopes in its queries, and says so.' },
 ];
 ---
-<Base title="About · Tejas More" description={`${site.role} in ${site.location}. B.Sc. in Artificial Intelligence (CGPA 9.71). Three production AI systems, built solo.`}>
+<Base title="About · Tejas More" description={`${site.role} in ${site.location}. B.Sc. in Artificial Intelligence (CGPA 9.71). Three deployed AI systems, built solo.`}>
   <section class="about-hero grain" data-theme="dark">
     <div class="container hero-grid">
       <div class="intro">
         <p class="eyebrow gradient-text" style="--g1: var(--aether-2); --g2: var(--aether)">About</p>
         <h1 class="display">Hi, I’m Tejas.</h1>
         <p class="lead">
-          An AI and software engineer in Mumbai. I build and deploy production AI systems and LLM applications end to end — and I care most
+          An AI and software engineer in Mumbai. I build and deploy AI systems and LLM applications end to end — and I care most
           about the part after the demo: making them <strong>reliable, secure and measurable</strong>.
         </p>
         <div class="cta-row">
@@ -65,7 +65,7 @@ const principles = [
   <section class="section" data-theme="light">
     <div class="container">
       <p class="eyebrow">The path so far</p>
-      <h2 class="h2" data-split>From PCM to production AI.</h2>
+      <h2 class="h2" data-split>From PCM to shipped AI.</h2>
       <ol class="timeline" data-stagger>
         {
           timeline.map((t) => (

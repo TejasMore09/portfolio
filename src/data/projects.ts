@@ -30,7 +30,6 @@ export interface Metric {
   method: string;
   source?: string;
   verified?: string;
-  count?: { to: number; decimals?: number; prefix?: string; suffix?: string };
 }
 
 export interface Highlight {
@@ -47,6 +46,7 @@ export interface Project {
   problem: string;
   summary: string;
   period: string;
+  codebaseSince: string; // first commit of the current repository; earlier work lived elsewhere
   stack: string[];
   live: { url: string; label: string };
   repo: { url: string; private: boolean };
@@ -68,8 +68,9 @@ export const projects: Project[] = [
     problem:
       'A small business runs on numbers it cannot read. Aether gives each one its own agent that judges every reading, sizes the loss, declines when acting doesn’t pay, and holds risky actions for a person.',
     summary:
-      'Aether is a self-evolving monitoring and decision platform for small businesses, each with its own isolated agent. It takes readings from whatever the business has, judges each against a band calibrated to that business, decides whether acting is worth the money, explains itself in the owner’s language — and holds any high-risk action until a person agrees.',
+      'Aether is an adaptive monitoring and decision platform for small businesses, each with its own isolated agent. It takes readings from whatever the business has, judges each against a band calibrated to that business, decides whether acting is worth the money, explains itself in the owner’s language — and holds any high-risk action until a person agrees.',
     period: 'Nov 2025 – present',
+    codebaseSince: 'Jun 2026',
     stack: ['Python', 'FastAPI', 'PostgreSQL + pgvector', 'SQLAlchemy', 'Next.js', 'TypeScript', 'Gemini', 'Xero OAuth 2.0', 'Docker', 'pytest'],
     live: { url: 'https://aether-ai-customer-app.vercel.app/explore', label: 'Live demo' },
     repo: { url: 'https://github.com/TejasMore09/Aether-AI', private: true },
@@ -78,7 +79,7 @@ export const projects: Project[] = [
     cover: aOverview,
     coverAlt: 'Aether overview: one decision awaiting the owner, $387 a day of exposure if unaddressed, and recent agent activity.',
     cardStats: [
-      { value: '$3.78/day', label: 'on a real book vs $400 to act: declined' },
+      { value: '$3.78/day', label: 'estimated on live Xero data vs $400 to act: declined' },
       { value: '1,388', label: 'tests, none skipped' },
     ],
     highlights: [
@@ -111,18 +112,17 @@ export const projects: Project[] = [
     metrics: [
       {
         value: '$3.78/day',
-        label: 'at risk on a real book, against $400 to act: declined',
-        context: 'live Xero data · $9,194.51 outstanding · overdue ratio 0.7555',
+        label: 'estimated loss on live Xero data, against $400 to act: declined',
+        context: 'Xero demo company over the live API · $9,194.51 outstanding · 15% a year assumed',
         method:
-          'Read from a live Xero organisation over OAuth 2.0 + PKCE: ar_total 9,194.51 and overdue ratio 0.7555, matching Xero’s own dashboard exactly. At 15% a year that book is about $3.78 a day at risk against a $400 one-off cost to act, so the engine declined to recommend spending money to save less, unprompted. On the worked example (2,846,000 × 34% × 0.0004 = $387.06 a day) the same test pays back in 1.0 day, so it acts and holds the action for a person.',
-        count: { to: 3.78, decimals: 2, prefix: '$', suffix: '/day' },
+          'Read from a Xero demo company over the live Xero API (OAuth 2.0 + PKCE): ar_total 9,194.51 and overdue ratio 0.7555, matching Xero’s own dashboard exactly. The books are Xero’s sample data, not a customer’s; no real business data has entered the system yet. At an assumed carrying cost of 15% a year, that book’s expected loss is about $3.78 a day against a $400 one-off cost to act, so the engine declined to recommend spending money to save less, unprompted. On the worked example (2,846,000 × 34% × 0.0004 = $387.06 a day) the same test pays back in 1.0 day, so it acts and holds the action for a person.',
       },
       {
         value: '12 of 25',
         label: 'tables under row-level security',
-        context: 'non-owner app role · proved in production',
+        context: 'non-owner app role · proved against a real Postgres in CI',
         method:
-          'Tenant scoping is the database’s job: no Python filters by tenant, so the isolation tests fail if a policy is dropped. Tests run many tenants concurrently on a shared pool, including a query whose nearest vector neighbour belongs to someone else.',
+          'All 12 tables that hold a business’s data carry a tenant_id and a row-level-security policy. The other 13 are the control plane (accounts, sessions, staff and platform records), which has no tenant_id and is protected by application logic. Tenant scoping is the database’s job: no Python filters by tenant, so the isolation tests fail if a policy is dropped. Tests run many tenants concurrently on a shared pool, including a query whose nearest vector neighbour belongs to someone else.',
       },
       {
         value: '1,388',
@@ -130,7 +130,6 @@ export const projects: Project[] = [
         context: '1,354 Python + 20 front-end + 14 browser · five CI gates',
         method:
           'pytest, ruff and mypy on the backend; component tests in both Next.js apps; and a real-Chrome check of the public page under both motion settings, all in GitHub Actions. Skipped tests are not allowed, and 120 decisions are logged in writing.',
-        count: { to: 1388 },
       },
     ],
   },
@@ -143,7 +142,8 @@ export const projects: Project[] = [
     summary:
       'Someone gets a message they’re unsure about — an invoice where the bank details changed, a “colleague” on WhatsApp — and pastes it, forwards it, or sends a screenshot or voice note. They get back a severity verdict, the exact phrases that triggered it, and an ordered list of what to do, starting with whatever is irreversible.',
     period: 'Mar 2026 – present',
-    stack: ['Python', 'FastAPI', 'PostgreSQL', 'Next.js', 'Claude', 'Tesseract OCR', 'Docker'],
+    codebaseSince: 'Sep 2026',
+    stack: ['Python', 'FastAPI', 'PostgreSQL', 'Next.js', 'Gemini', 'Tesseract OCR', 'Docker'],
     live: { url: 'https://darkhorsemain.vercel.app/', label: 'Try it live' },
     repo: { url: 'https://github.com/TejasMore09/DarkHorse_AI_main', private: true },
     caseStudy: '/work/darkhorse',
@@ -151,7 +151,7 @@ export const projects: Project[] = [
     cover: dCritical,
     coverAlt: 'DarkHorse verdict: Critical, 94% likely an attack, “Do not act on this message”, with quoted evidence and ordered steps.',
     cardStats: [
-      { value: '1.355%', label: 'false positives · 9 of 664' },
+      { value: '1.355%', label: 'false positives · 9 of 664 on a held-out set' },
       { value: '6', label: 'signals, each allowed to say “couldn’t check”' },
     ],
     highlights: [
@@ -185,11 +185,10 @@ export const projects: Project[] = [
       {
         value: '1.355%',
         label: 'false-positive rate',
-        context: '9 of 664 legitimate · recall 11.1% (6 of 54)',
+        context: '9 of 664 legitimate · recall 11.1% (6 of 54) · 3 of 6 signals, network off',
         method:
           'Frozen held-out set of 718 messages (fingerprint 9fc2bac7e80a21ce), threshold 0.460, reproduced with `python -m darkhorse.eval`. Scope: three of six signals, network off, corpora that predate 2010. An earlier 0.55% figure was withdrawn because it could not be reproduced.',
         source: 'https://darkhorsemain.vercel.app/',
-        count: { to: 1.355, decimals: 3, suffix: '%' },
       },
       {
         value: '2 of 8',
@@ -200,10 +199,10 @@ export const projects: Project[] = [
       },
       {
         value: '$0.00048',
-        label: 'model cost per check',
-        context: '~1.2 s per text check · tracked per tenant',
+        label: 'model cost per check, measured in evaluation',
+        context: '~1.2 s per text check · at Claude Haiku list prices',
         method:
-          'Persuasion analysis is the only signal that calls a model (Claude Haiku). Deterministic signals take 0.4–1.4 ms per message; the full text check measured ~1.2 s on the deployed instance.',
+          'Persuasion analysis is the only signal that calls a model. This cost comes from evaluation runs priced at Claude Haiku’s list rates, the model its prompt and thresholds were tuned against. Production now runs Gemini 3.5 Flash Lite, listed at well under half Haiku’s price per token, and no production check has been priced yet. Deterministic signals take 0.4–1.4 ms per message; the full text check measured ~1.2 s on the deployed instance.',
       },
     ],
   },
@@ -216,6 +215,7 @@ export const projects: Project[] = [
     summary:
       'Fintrust reads RBI and SEBI circulars and master directions and explains what they require, in plain language, for SEBI-registered advisers, research analysts and small NBFCs. A 99-page master circular becomes a cited explanation, a list of obligations, real due dates on a deadline board — and answers to questions about the rules.',
     period: 'Apr 2026 – present',
+    codebaseSince: 'Sep 2026',
     stack: ['Python', 'FastAPI', 'PostgreSQL + pgvector', 'Next.js', 'Gemini', 'Playwright'],
     live: { url: 'https://fintrust-rho.vercel.app/', label: 'Visit Fintrust' },
     repo: { url: 'https://github.com/TejasMore09/fintrust-regintel', private: true },
@@ -225,7 +225,7 @@ export const projects: Project[] = [
     coverPosition: 'left top',
     coverAlt: 'Fintrust answering “How many days do I have to resolve a client grievance?” with two cited sources highlighted in the regulator’s text.',
     cardStats: [
-      { value: '177/179', label: 'AI statements verified' },
+      { value: '177/179', label: 'statements with their quote found in the source' },
       { value: '132', label: 'deadlines, computed by code' },
     ],
     highlights: [
@@ -252,19 +252,18 @@ export const projects: Project[] = [
       {
         image: fPhone,
         title: 'On a phone, too.',
-        caption: '“42 of 42 statements matched their quote in the source. Anything that doesn’t is withheld.”',
+        caption: 'One adviser’s dashboard: “42 of 42 statements matched their quote in the source. Anything that doesn’t is withheld.”',
         phone: true,
       },
     ],
     metrics: [
       {
         value: '98.9%',
-        label: 'AI statements verified against the source',
-        context: '177 of 179 · the other 2 withheld',
+        label: 'explanation statements whose quote was found in the source',
+        context: '177 of 179 · the other 2 withheld · obligations: 82 of 90 kept',
         method:
-          'The model must quote the regulator’s words for every statement; code then finds that quote as a character span in the stored, immutable text of the document. Anything whose quote cannot be found is stored but never shown.',
+          'The model must quote the regulator’s words for every statement; code then finds that quote as a character span in the stored, immutable text of the document. Anything whose quote cannot be found is stored but never shown. A match proves the quote is really in the source, not that the statement reads it correctly; that human review step isn’t built yet.',
         source: 'https://fintrust-rho.vercel.app/',
-        count: { to: 98.9, decimals: 1, suffix: '%' },
       },
       {
         value: '132',
@@ -272,20 +271,18 @@ export const projects: Project[] = [
         context: 'window: 3 months back to 24 ahead',
         method:
           'The model extracts obligations as cited records; code checks each deadline appears inside its own quote, then a deterministic, non-LLM generator turns them into dates.',
-        count: { to: 132 },
       },
       {
         value: '225',
         label: 'tests against a real Postgres',
         context: 'incl. tests that the database refuses unevidenced statements',
         method: 'pytest against PostgreSQL (not mocks), CI-gated in GitHub Actions; Playwright for the web app.',
-        count: { to: 225 },
       },
     ],
   },
 ];
 
-export const testCounts = { aether: 1388, darkhorse: 1135, fintrust: 225 };
+export const testCounts = { aether: 1388, darkhorse: 1246, fintrust: 225 }; // every CI-gated test
 export const totalTests = testCounts.aether + testCounts.darkhorse + testCounts.fintrust;
 
 const bySlug = (slug: Project['slug']) => projects.find((p) => p.slug === slug)!;
@@ -297,8 +294,8 @@ export const heroMetrics: Metric[] = [
   {
     value: totalTests.toLocaleString('en-US'),
     label: 'tests across three live systems',
-    context: '1,388 + 1,135 + 225',
-    method: 'Sum of the CI-gated test suites of Aether, DarkHorse AI and Fintrust, as of October 2026.',
-    count: { to: totalTests },
+    context: '1,388 + 1,246 + 225',
+    method:
+      'Every CI-gated test, as of October 2026: Aether 1,388 (1,354 Python + 34 front-end and browser), DarkHorse AI 1,246 (1,135 detection engine + 111 web app) and Fintrust 225.',
   },
 ];

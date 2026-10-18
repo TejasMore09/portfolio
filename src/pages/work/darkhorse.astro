@@ -93,10 +93,28 @@ const p = projects.find((x) => x.slug === 'darkhorse')!;
     <div class="tiles" data-stagger>
       <div class="tile"><span class="label">auth</span><h3>Sender authentication</h3><p>SPF, DKIM and DMARC verified from raw headers. Catches a forged <code>From:</code>.</p></div>
       <div class="tile"><span class="label">domain</span><h3>Registration age</h3><p>How long the sending domain has existed — fresh domains are a classic tell.</p></div>
-      <div class="tile"><span class="label">lookalike</span><h3>Impersonation</h3><p>Domains that read as the real one, measured by edit distance against the registrable domain.</p></div>
+      <div class="tile"><span class="label">lookalike</span><h3>Impersonation</h3><p>Domains that read as the real one: ASCII homoglyphs, brand names inside other domains, and a one-character edit check, each kept only after it was measured.</p></div>
       <div class="tile"><span class="label">url</span><h3>Link reputation</h3><p>Every link checked and recorded as evidence, capped at 40 per message.</p></div>
       <div class="tile"><span class="label">attachment</span><h3>File analysis</h3><p>Type detected from content, not extension; macros in Office files; mismatches flagged.</p></div>
       <div class="tile"><span class="label">coercion · the only model call</span><h3>Persuasion analysis</h3><p>Seven levers — authority, urgency, scarcity, reciprocity, social proof, isolation, fear — multiplied by what the message asks you to do. Urgency in a message that asks nothing is just tone.</p></div>
+    </div>
+    <div class="callout" data-reveal>
+      <h3>The obvious lookalike check flagged 11.1% of legitimate domains. So it was removed.</h3>
+      <pre class="formula" tabindex="0">measured on 1,607 legitimate domains (SpamAssassin ham) and on phishing feeds
+
+                    config               legit     feeds
+edit distance 2     10k brands, len 4   11.139%   1.624%   <span class="no">removed</span>
+edit distance 1     1k brands, len 6     0.062%   0.076%   <span class="ok">kept</span>
+brand token         500 brands, len 5    0.124%   0.567%   <span class="ok">kept</span>
+ascii homoglyph     10k brands           0.000%   0.038%   <span class="ok">kept</span>
+
+whole signal, re-measured:  3 / 1,607 = 0.19% false positives   (was 12.01%)</pre>
+      <p>
+        Edit distance against the top 10,000 brands was built first. It read applix.com as apple.com and amanda.org as
+        panda.org, and every one of those would have been a customer asking why their supplier was quarantined. At every
+        setting it fired more often on legitimate mail than on the phishing feeds, so it was deleted, and what remains was
+        measured before it was kept.
+      </p>
     </div>
   </section>
 
@@ -104,7 +122,7 @@ const p = projects.find((x) => x.slug === 'darkhorse')!;
     <p class="kicker">05 — The most important decision</p>
     <div class="callout" data-reveal>
       <h3>An LLM asked to find persuasion will invent it. So every quote is checked.</h3>
-      <pre class="formula">model returns   lever = urgency
+      <pre class="formula" tabindex="0">model returns   lever = urgency
                 quote = "before the board call at 4pm"
 
 verify_spans(quote, original_message)
@@ -192,18 +210,20 @@ verify_spans(quote, original_message)
   </section>
 
   <section class="chapter">
-    <p class="kicker">10 — Built for production</p>
+    <p class="kicker">10 — Deployment and hardening</p>
     <h2 data-split>The unglamorous parts.</h2>
     <div class="numbers" data-stagger>
-      <div><b>1,135</b><span>tests, CI-gated</span></div>
+      <div><b>1,246</b><span>tests, CI-gated: 1,135 engine, 111 web app</span></div>
       <div><b>~1.2 s</b><span>per text check, including persuasion analysis</span></div>
       <div><b>0.4–1.4 ms</b><span>for the deterministic signals alone</span></div>
-      <div><b>$0.00048</b><span>model cost per check, tracked per tenant</span></div>
+      <div><b>$0.00048</b><span>model cost per check, measured in evaluation</span></div>
     </div>
     <div class="prose" data-reveal>
       <p>
         Row-level security verified in production, not only in tests. Argon2 password hashing, rate limiting, a hash-chained
-        audit trail, GDPR-shaped account erasure, and a multi-stage Docker image with no compiler at runtime.
+        audit trail, GDPR-shaped account erasure, and a multi-stage Docker image with no compiler at runtime. Since 11
+        October the 90-day retention sweep runs daily, and backups are taken by the project itself and restore-verified,
+        with the row-level-security policy count checked afterwards, because that is what a restore silently loses.
       </p>
     </div>
   </section>

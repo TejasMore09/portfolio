@@ -6,7 +6,6 @@ interface Props {
   metric: Metric;
 }
 const { metric } = Astro.props;
-const c = metric.count;
 const dev = import.meta.env.DEV;
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const method = esc(metric.method).replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -15,11 +14,7 @@ const long = metric.value.length > 6; // e.g. "$0.00048", "12 of 25": step the s
 <details class="stat">
   <summary>
     <span
-      class:list={['stat-value', { long }]}
-      data-count={c?.to}
-      data-decimals={c?.decimals}
-      data-prefix={c?.prefix}
-      data-suffix={c?.suffix}>{metric.value}</span
+      class:list={['stat-value', { long }]}>{metric.value}</span
     >
     <span class="stat-label">{metric.label}</span>
     {metric.context && <span class="stat-context">{metric.context}</span>}

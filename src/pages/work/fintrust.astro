@@ -7,6 +7,7 @@ import { fintrustFlow } from '../../data/diagrams';
 import explained from '../../assets/projects/fintrust/fig-explained.jpg';
 import notInDocuments from '../../assets/projects/fintrust/fig-not-in-documents.jpg';
 import deadlines from '../../assets/projects/fintrust/fig-deadlines.jpg';
+import provisionMap from '../../assets/projects/fintrust/fig-provision-map.jpg';
 
 const p = projects.find((x) => x.slug === 'fintrust')!;
 ---
@@ -50,7 +51,7 @@ const p = projects.find((x) => x.slug === 'fintrust')!;
     <p class="kicker">03 — Grounding</p>
     <div class="callout" data-reveal>
       <h3>How a statement earns its place on screen.</h3>
-      <pre class="formula">the model must quote      "...not later than 21 days of the receipt of the grievance"
+      <pre class="formula" tabindex="0">the model must quote      "...not later than 21 days of the receipt of the grievance"
 code finds the quote      at a character span in the immutable version text
 each task adds checks     a deadline must appear inside its own quote
 stored either way         <span class="ok">shown only if supported</span>
@@ -109,7 +110,30 @@ explanations of the 7 documents:  179 statements  →  <span class="ok">177 show
   </section>
 
   <section class="chapter">
-    <p class="kicker">06 — What it taught</p>
+    <p class="kicker">06 — What applies, and what changed</p>
+    <h2 data-split>Most of it doesn’t apply to you. Some of it quietly stopped existing.</h2>
+    <div class="prose" data-reveal>
+      <p>
+        A user says once what they’re registered as, and every document and obligation is filtered to what applies,
+        including anything addressed to a wider group they belong to. An investment adviser is also a SEBI-registered
+        intermediary, so SEBI’s social-media circular applies to them even though its title doesn’t say so.
+      </p>
+      <p>
+        When a document is repealed, the useful question is what happened to each rule. When RBI’s 2026 TReDS directions
+        replaced the 2014 guidelines, Fintrust mapped all <strong>16 provisions</strong>: 10 carried over, 2 changed and
+        4 not carried over, among them the T+2 settlement rule. Each entry quotes the old text and, unless the rule was
+        dropped, the new one.
+      </p>
+    </div>
+    <Shot
+      image={provisionMap}
+      alt="Fintrust's map of the repealed TReDS guidelines: All 16, Changed 2, Not carried over 4, Carried over 10, listing the four provisions not carried over."
+      caption="“Not carried over” is the model’s reading, so the page says code only checked that the old wording is absent, and asks you to confirm it."
+    />
+  </section>
+
+  <section class="chapter">
+    <p class="kicker">07 — What it taught</p>
     <h2 data-split>Defects no single test would have shown.</h2>
     <ol class="defects" data-stagger>
       <li><div><strong>Anyone could stall the whole API.</strong><p>Sign-in held one pooled connection while recording on a second; ten parallel failed sign-ins took all ten and deadlocked until timeout. Rule since: never await a second pooled connection while holding one.</p></div></li>
@@ -122,7 +146,7 @@ explanations of the 7 documents:  179 statements  →  <span class="ok">177 show
   </section>
 
   <section class="chapter">
-    <p class="kicker">07 — What isn’t finished</p>
+    <p class="kicker">08 — What isn’t finished</p>
     <h2 data-split>Honest limitations.</h2>
     <div class="prose" data-reveal>
       <ul>
@@ -136,12 +160,12 @@ explanations of the 7 documents:  179 statements  →  <span class="ok">177 show
   </section>
 
   <section class="chapter">
-    <p class="kicker">08 — Built to be checked</p>
+    <p class="kicker">09 — Built to be checked</p>
     <h2 data-split>The unglamorous parts.</h2>
     <div class="numbers" data-stagger>
       <div><b>225</b><span>tests against a real Postgres</span></div>
-      <div><b>WCAG 2.1 AA</b><span>on every page</span></div>
-      <div><b>100%</b><span>of AI calls logged — model, prompt version, tokens, latency</span></div>
+      <div><b>0</b><span>automated WCAG 2.1 AA violations (axe-core) on any page</span></div>
+      <div><b>All</b><span>model outputs stored with their model, prompt version, tokens and latency</span></div>
     </div>
   </section>
 </ProjectLayout>

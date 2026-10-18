@@ -1,5 +1,5 @@
 // Site-wide motion: smooth scroll, scroll reveals, split-line headings, scroll-lit statements,
-// count-ups, tilt, magnetic buttons, a custom cursor and a nav that adapts to the section under
+// tilt, magnetic buttons, a custom cursor and a nav that adapts to the section under
 // it. Without JS — or with reduced motion — every page stays static and fully readable.
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -26,13 +26,15 @@ function smoothScroll() {
 // refreshes, and on elements with a CSS transform transition (cards, buttons) it read a value
 // mid-transition and left them stuck part-way down. CSS transitions pause while GSAP moves the
 // element, and the inline transform is cleared afterwards so CSS hover effects work again.
+// Opacity, not autoAlpha: visibility:hidden would hide not-yet-revealed text from find-in-page and
+// screen readers.
 function reveal(targets: HTMLElement[], trigger: HTMLElement, y: number, start: string, vars: gsap.TweenVars) {
   gsap.fromTo(
     targets,
-    { y, autoAlpha: 0 },
+    { y, opacity: 0 },
     {
       y: 0,
-      autoAlpha: 1,
+      opacity: 1,
       ease: 'expo.out',
       ...vars,
       scrollTrigger: { trigger, start, once: true },
@@ -59,6 +61,7 @@ function splitHeadings() {
   if (reduce) return;
   for (const el of $$('[data-split]')) {
     SplitText.create(el, {
+      aria: 'none',
       type: 'lines',
       mask: 'lines',
       autoSplit: true,
@@ -75,6 +78,7 @@ function splitHeadings() {
   // Apple-style statement: words light up as the paragraph scrolls through the viewport.
   for (const el of $$('[data-light-up]')) {
     SplitText.create(el, {
+      aria: 'none',
       type: 'words',
       autoSplit: true,
       onSplit: (self) =>
@@ -88,27 +92,6 @@ function splitHeadings() {
             scrollTrigger: { trigger: el, start: 'top 78%', end: 'bottom 52%', scrub: true },
           },
         ),
-    });
-  }
-}
-
-function counters() {
-  for (const el of $$('[data-count]')) {
-    const to = Number(el.dataset.count);
-    if (!Number.isFinite(to) || reduce) continue;
-    const decimals = Number(el.dataset.decimals ?? 0);
-    const prefix = el.dataset.prefix ?? '';
-    const suffix = el.dataset.suffix ?? '';
-    const fmt = (v: number) =>
-      prefix + v.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
-    const state = { v: 0 };
-    el.textContent = fmt(0);
-    ScrollTrigger.create({
-      trigger: el,
-      start: 'top 92%',
-      once: true,
-      onEnter: () =>
-        gsap.to(state, { v: to, duration: 2, ease: 'power3.out', onUpdate: () => (el.textContent = fmt(state.v)) }),
     });
   }
 }
@@ -254,7 +237,6 @@ smoothScroll();
 navTone();
 cursor();
 reveals();
-counters();
 scrollScenes();
 tilt();
 magnetic();

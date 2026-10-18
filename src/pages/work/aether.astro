@@ -59,7 +59,7 @@ const p = projects.find((x) => x.slug === 'aether')!;
     <p class="kicker">03 — The economic test</p>
     <div class="callout" data-reveal>
       <h3>It will not spend a business’s money to save less of it.</h3>
-      <pre class="formula">expected_daily_loss = exposure × at_risk_share × daily_rate
+      <pre class="formula" tabindex="0">expected_daily_loss = exposure × at_risk_share × daily_rate
                     = 2,846,000 × 34% × 0.0004/day       = $387.06 a day
 
 payback_days        = intervention_cost / expected_daily_loss
@@ -142,7 +142,7 @@ same test, a $284,600 book:  $38.71 a day  →  10.3 days  →  <span class="no"
       </p>
     </div>
     <div class="callout" data-reveal>
-      <pre class="formula">status=accepted  source=connector
+      <pre class="formula" tabindex="0">status=accepted  source=connector
   ar_total            9194.51
   dso_days            20.5
   overdue_ratio       0.7555
@@ -150,9 +150,10 @@ same test, a $284,600 book:  $38.71 a day  →  10.3 days  →  <span class="no"
 
 verdict: <span class="ok">MONITOR MEDIUM</span>   triggered_by=nano-monitor:receivables</pre>
       <p>
-        The verdict is not an alarm, and that is the interesting part. $9,194 outstanding at 15% a year is about $3.78 a
-        day at risk, against $400 to act, so the engine declined to recommend spending money to save less: on a real
-        book, unprompted, with nobody watching. Left alone for six days, it logged <code>dso_days</code> rising exactly
+        The verdict is not an alarm, and that is the interesting part. At an assumed 15% a year, $9,194 outstanding is an
+        estimated $3.78 a day at risk against $400 to act, so the engine declined to recommend spending money to save
+        less, unprompted, with nobody watching. The books were a Xero demo company’s, read over the real API; no
+        customer’s data has entered the system yet. Left alone for six days, it logged <code>dso_days</code> rising exactly
         +1.0 a day as the same invoices aged, five verified backups, and zero faults.
       </p>
     </div>

@@ -31,6 +31,7 @@ import { certificates } from '../data/certificates';
     </style>
   </head>
   <body>
+    <main>
     <h1><Image src={logo} alt="" width={128} widths={[64, 128]} sizes="48px" loading="eager" />{site.name}</h1>
     <p><strong>{site.role}</strong> · {site.location} · {site.status}</p>
     <p>{site.positioning}</p>
@@ -48,7 +49,7 @@ import { certificates } from '../data/certificates';
           <h3>
             {p.name} — {p.tagline}
           </h3>
-          <p class="muted">{p.period} · {p.stack.join(', ')}</p>
+          <p class="muted">{p.period} (this codebase since {p.codebaseSince}) · {p.stack.join(', ')}</p>
           <p>{p.summary}</p>
           <ul>
             {p.metrics.map((m) => (
@@ -91,6 +92,7 @@ import { certificates } from '../data/certificates';
       FastAPI, Next.js, React, SQLAlchemy, Express · PostgreSQL, MongoDB, MySQL, ChromaDB · Docker, Git, GitHub Actions,
       Vercel, Render, Neon, OAuth 2.0
     </p>
+    </main>
     <Analytics />
   </body>
 </html>

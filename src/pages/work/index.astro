@@ -4,7 +4,7 @@ import PageHero from '../../components/PageHero.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { projects, totalTests } from '../../data/projects';
 ---
-<Base title="Work · Tejas More" description="Three production AI systems, built solo: Aether, DarkHorse AI and Fintrust.">
+<Base title="Work · Tejas More" description="Three deployed AI systems, built solo: Aether, DarkHorse AI and Fintrust.">
   <PageHero
     eyebrow="Work"
     title="Three systems. All live."
@@ -13,7 +13,7 @@ import { projects, totalTests } from '../../data/projects';
   />
   <section class="section-tight" data-theme="light">
     <div class="container stack">
-      {projects.map((p, i) => <ProjectCard project={p} index={i} stack />)}
+      {projects.map((p, i) => <ProjectCard project={p} index={i} level={2} stack />)}
     </div>
   </section>
 </Base>

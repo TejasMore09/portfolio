@@ -110,7 +110,7 @@ export const darkhorseFlow: FlowDiagram = {
         },
         {
           kind: 'llm',
-          tag: 'LLM · Claude Haiku',
+          tag: 'LLM · Gemini 3.5 Flash Lite',
           title: 'Persuasion analysis',
           detail: 'seven levers × the requested action, scored multiplicatively · $0.00048 a check',
         },

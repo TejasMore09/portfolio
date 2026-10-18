@@ -25,7 +25,7 @@
   --darkhorse-2: #ff9a8b;
   --fintrust: #13c48f;
   --fintrust-2: #4fd1ff;
-  --blue: #2f6bff;
+  --blue: #2860e8;
   /* Darker versions for small text on light backgrounds (contrast) */
   --aether-ink: #c2410c;
   --darkhorse-ink: #cc1f3a;
@@ -39,7 +39,7 @@
   --text: #1d1d1f;
   --muted: #6e6e73;
   --rule: rgba(0, 0, 0, 0.1);
-  --accent: #2f6bff;
+  --accent: #2860e8;
   --verified: #0a9b6b;
   --unavailable: #b06d12;
   --shadow: 0 30px 80px -30px rgba(15, 20, 40, 0.28), 0 8px 24px -12px rgba(15, 20, 40, 0.16);
@@ -74,7 +74,7 @@
   --text: #1d1d1f;
   --muted: #6e6e73;
   --rule: rgba(0, 0, 0, 0.1);
-  --accent: #2f6bff;
+  --accent: #2860e8;
   --verified: #0a9b6b;
   --unavailable: #b06d12;
   color-scheme: light;
@@ -319,8 +319,8 @@ code {
 .btn-glass {
   background: color-mix(in srgb, var(--ink) 10%, transparent);
   color: var(--ink);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 .btn-sm {
   --h: 38px;
@@ -358,8 +358,8 @@ code {
   font-weight: 520;
   color: var(--ink);
   background: color-mix(in srgb, var(--ink) 7%, transparent);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .dot {
   width: 8px;
@@ -474,4 +474,9 @@ code {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* In-page jumps land below the floating nav instead of under it. */
+[id] {
+  scroll-margin-top: calc(var(--nav-h) + 32px);
 }

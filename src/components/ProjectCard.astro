@@ -8,8 +8,10 @@ interface Props {
   project: Project;
   index: number;
   stack?: boolean;
+  level?: 2 | 3; // heading level: h2 where the cards sit directly under the page title
 }
-const { project: p, index, stack = false } = Astro.props;
+const { project: p, index, stack = false, level = 3 } = Astro.props;
+const Heading = level === 2 ? 'h2' : 'h3';
 ---
 <article
   class={`pcard pcard-${p.slug}`}
@@ -19,7 +21,7 @@ const { project: p, index, stack = false } = Astro.props;
   <div class="pcard-inner">
     <div class="pcard-text">
       <p class="label">0{index + 1} · {p.period}</p>
-      <h3 class="pcard-name">{p.name}</h3>
+      <Heading class="pcard-name">{p.name}</Heading>
       <p class="pcard-tag gradient-text">{p.tagline}.</p>
       <p class="pcard-problem">{p.problem}</p>
       <dl class="pcard-stats">
@@ -54,6 +56,7 @@ const { project: p, index, stack = false } = Astro.props;
 
 <style>
   .pcard {
+    min-width: 0; /* a grid item may not otherwise shrink below its content on a phone */
     position: sticky;
     top: calc(var(--nav-h) + 28px + var(--i) * 16px);
     background: none;

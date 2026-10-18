@@ -29,7 +29,7 @@ const posts = await getPosts();
       </div>
     </div>
     <div class="container hero-facts" aria-label="At a glance">
-      <span><b>3</b> production AI systems</span>
+      <span><b>3</b> deployed AI systems</span>
       <span><b>{totalTests.toLocaleString('en-US')}</b> tests</span>
       <span><b>9.71</b> CGPA, B.Sc. AI</span>
       <span class="scroll-cue" aria-hidden="true">Scroll</span>
@@ -71,7 +71,7 @@ const posts = await getPosts();
       <div class="work-head">
         <p class="eyebrow">Selected work</p>
         <h2 class="h2" data-split>Three systems.<br /> All live.</h2>
-        <p class="lead" data-reveal>Built solo, from architecture to production. Open any one for the full story.</p>
+        <p class="lead" data-reveal>Built solo, from architecture to deployment. Open any one for the full story.</p>
       </div>
       <div class="stack">
         {projects.map((p, i) => <ProjectCard project={p} index={i} stack />)}
@@ -114,7 +114,7 @@ const posts = await getPosts();
         <article class="pcell">
           <div class="pviz pviz-calc">
             <div class="pviz-row stacked"><span>$387.06/day at risk · $400 to act</span><span class="status ok">Act · pays back in 1.0 day</span></div>
-            <div class="pviz-row stacked"><span>$3.78/day at risk · $400 to act</span><span class="status warn">Decline · a real Xero book</span></div>
+            <div class="pviz-row stacked"><span>$3.78/day at risk · $400 to act</span><span class="status warn">Decline · Xero demo data</span></div>
             <p class="mono small">payback horizon: 7 days · then a person approves</p>
           </div>
           <h3 class="h3">Acting has to pay for itself.</h3>
@@ -158,7 +158,7 @@ const posts = await getPosts();
       <PostList posts={posts} variant="cards" limit={3}>
         <div class="medium-empty card" slot="empty">
           <p>
-            <strong>First posts are on the way.</strong> I write on Medium about building AI systems that can be checked —
+            <strong>First posts are on the way.</strong> I’ll be writing on Medium about building AI systems that can be checked —
             starting with the stories behind these three projects.
           </p>
           <a class="btn btn-primary" href={site.medium} target="_blank" rel="noopener">Follow on Medium ↗</a>
