@@ -66,11 +66,11 @@ export const projects: Project[] = [
     name: 'Aether',
     tagline: 'An AI agent that decides whether acting is worth the money',
     problem:
-      'A small business runs on numbers it cannot read. Aether gives each one its own agent that judges every reading, sizes the loss, and holds risky actions for a person.',
+      'A small business runs on numbers it cannot read. Aether gives each one its own agent that judges every reading, sizes the loss, declines when acting doesn’t pay, and holds risky actions for a person.',
     summary:
-      'Aether gives every small business its own isolated agent. It takes readings from whatever the business has, judges each against a band calibrated to that business, decides whether acting is worth the money, explains itself in the owner’s language — and holds any high-risk action until a person agrees.',
+      'Aether is a self-evolving monitoring and decision platform for small businesses, each with its own isolated agent. It takes readings from whatever the business has, judges each against a band calibrated to that business, decides whether acting is worth the money, explains itself in the owner’s language — and holds any high-risk action until a person agrees.',
     period: 'Nov 2025 – present',
-    stack: ['Python', 'FastAPI', 'PostgreSQL + pgvector', 'Next.js', 'Gemini', 'Xero OAuth 2.0', 'Docker'],
+    stack: ['Python', 'FastAPI', 'PostgreSQL + pgvector', 'SQLAlchemy', 'Next.js', 'TypeScript', 'Gemini', 'Xero OAuth 2.0', 'Docker', 'pytest'],
     live: { url: 'https://aether-ai-customer-app.vercel.app/explore', label: 'Live demo' },
     repo: { url: 'https://github.com/TejasMore09/Aether-AI', private: true },
     caseStudy: '/work/aether',
@@ -78,8 +78,8 @@ export const projects: Project[] = [
     cover: aOverview,
     coverAlt: 'Aether overview: one decision awaiting the owner, $387 a day of exposure if unaddressed, and recent agent activity.',
     cardStats: [
-      { value: '$387.06/day', label: 'sized before it acts' },
-      { value: '1,323', label: 'tests, none skipped' },
+      { value: '$3.78/day', label: 'on a real book vs $400 to act: declined' },
+      { value: '1,388', label: 'tests, none skipped' },
     ],
     highlights: [
       {
@@ -110,13 +110,12 @@ export const projects: Project[] = [
     ],
     metrics: [
       {
-        value: '1.0 day',
-        label: 'payback before it will act',
-        context: '$387.06/day at risk vs $400 to act · 7-day horizon',
+        value: '$3.78/day',
+        label: 'at risk on a real book, against $400 to act: declined',
+        context: 'live Xero data · $9,194.51 outstanding · overdue ratio 0.7555',
         method:
-          'expected daily loss = exposure × at-risk share × daily rate (2,846,000 × 34% × 0.0004 = $387.06). Payback = cost to act ÷ daily loss = 1.0 day, inside the receivables pack’s 7-day horizon, so it acts — and gates the action on a person. On a $284,600 book the same test gives 10.3 days and the engine declines.',
-        source: 'https://aether-ai-customer-app.vercel.app/explore',
-        count: { to: 1, decimals: 1, suffix: ' day' },
+          'Read from a live Xero organisation over OAuth 2.0 + PKCE: ar_total 9,194.51 and overdue ratio 0.7555, matching Xero’s own dashboard exactly. At 15% a year that book is about $3.78 a day at risk against a $400 one-off cost to act, so the engine declined to recommend spending money to save less, unprompted. On the worked example (2,846,000 × 34% × 0.0004 = $387.06 a day) the same test pays back in 1.0 day, so it acts and holds the action for a person.',
+        count: { to: 3.78, decimals: 2, prefix: '$', suffix: '/day' },
       },
       {
         value: '12 of 25',
@@ -126,11 +125,12 @@ export const projects: Project[] = [
           'Tenant scoping is the database’s job: no Python filters by tenant, so the isolation tests fail if a policy is dropped. Tests run many tenants concurrently on a shared pool, including a query whose nearest vector neighbour belongs to someone else.',
       },
       {
-        value: '1,323',
+        value: '1,388',
         label: 'tests, none skipped',
-        context: 'CI-gated · 114 decisions logged',
-        method: 'pytest, ruff and mypy in GitHub Actions; skipped tests are not allowed.',
-        count: { to: 1323 },
+        context: '1,354 Python + 20 front-end + 14 browser · five CI gates',
+        method:
+          'pytest, ruff and mypy on the backend; component tests in both Next.js apps; and a real-Chrome check of the public page under both motion settings, all in GitHub Actions. Skipped tests are not allowed, and 120 decisions are logged in writing.',
+        count: { to: 1388 },
       },
     ],
   },
@@ -285,7 +285,7 @@ export const projects: Project[] = [
   },
 ];
 
-export const testCounts = { aether: 1323, darkhorse: 1135, fintrust: 225 };
+export const testCounts = { aether: 1388, darkhorse: 1135, fintrust: 225 };
 export const totalTests = testCounts.aether + testCounts.darkhorse + testCounts.fintrust;
 
 const bySlug = (slug: Project['slug']) => projects.find((p) => p.slug === slug)!;
@@ -297,7 +297,7 @@ export const heroMetrics: Metric[] = [
   {
     value: totalTests.toLocaleString('en-US'),
     label: 'tests across three live systems',
-    context: '1,323 + 1,135 + 225',
+    context: '1,388 + 1,135 + 225',
     method: 'Sum of the CI-gated test suites of Aether, DarkHorse AI and Fintrust, as of October 2026.',
     count: { to: totalTests },
   },

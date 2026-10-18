@@ -149,12 +149,18 @@ same test, a $284,600 book:  $38.71 a day  →  10.3 days  →  <span class="no"
   top5_concentration  0.9746
 
 verdict: <span class="ok">MONITOR MEDIUM</span>   triggered_by=nano-monitor:receivables</pre>
+      <p>
+        The verdict is not an alarm, and that is the interesting part. $9,194 outstanding at 15% a year is about $3.78 a
+        day at risk, against $400 to act, so the engine declined to recommend spending money to save less: on a real
+        book, unprompted, with nobody watching. Left alone for six days, it logged <code>dso_days</code> rising exactly
+        +1.0 a day as the same invoices aged, five verified backups, and zero faults.
+      </p>
     </div>
   </section>
 
   <section class="chapter">
     <p class="kicker">08 — What didn’t work</p>
-    <h2 data-split>Seven defects that only running it could find.</h2>
+    <h2 data-split>Ten defects that only running it could find.</h2>
     <div class="prose" data-reveal>
       <p>Every test was green. Each of these was invisible until the system actually ran somewhere it wasn’t written:</p>
     </div>
@@ -166,7 +172,18 @@ verdict: <span class="ok">MONITOR MEDIUM</span>   triggered_by=nano-monitor:rece
       <li><div><strong>Xero had deprecated the scope the code asked for.</strong><p>Every new app since March 2026 gets only granular scopes.</p></div></li>
       <li><div><strong>The report the connector read doesn’t exist in that shape.</strong><p>Twenty-seven tests passed against it — the fixtures were built from the same misreading as the parser.</p></div></li>
       <li><div><strong>A metric the pack requires was never produced.</strong><p>Every Xero reading would have been quarantined as incomplete, whatever came back.</p></div></li>
+      <li><div><strong>The public page’s headline sat at $0.</strong><p>Right next to a sentence giving the real figure.</p></div></li>
+      <li><div><strong>The public page went blank with reduced motion on.</strong><p>Visitors who turn animations off got an empty page.</p></div></li>
+      <li><div><strong>A figure a hundred times too large.</strong><p>The worked example said $3,874.56 a day where its own inputs give $38.71.</p></div></li>
     </ol>
+    <div class="prose" data-reveal>
+      <p>
+        The front ends had no rendering test, which is how one public page shipped the last three at once. They have
+        them now: twenty component tests and a fourteen-assertion check in real Chrome, both in CI. And replacing
+        example-based tests with property assertions caught, in one second, that the payables integration never emitted
+        a metric its pack requires, which would have quietly quarantined every payables reading.
+      </p>
+    </div>
     <blockquote data-reveal>An integration nobody has run is a guess with tests around it.</blockquote>
   </section>
 
@@ -174,10 +191,10 @@ verdict: <span class="ok">MONITOR MEDIUM</span>   triggered_by=nano-monitor:rece
     <p class="kicker">09 — Operations</p>
     <h2 data-split>Running unattended.</h2>
     <div class="numbers" data-stagger>
-      <div><b>1,323</b><span>tests, none skipped</span></div>
-      <div><b>4</b><span>services, deployed</span></div>
-      <div><b>114</b><span>decisions logged in writing</span></div>
-      <div><b>2.11 min</b><span>measured rollback drill, both directions</span></div>
+      <div><b>1,388</b><span>tests, none skipped, five CI gates</span></div>
+      <div><b>5</b><span>services deployed: 3 FastAPI, 2 Next.js</span></div>
+      <div><b>120</b><span>decisions logged in writing</span></div>
+      <div><b>2m 11s</b><span>measured rollback across three services, both ways</span></div>
     </div>
     <div class="prose" data-reveal>
       <p>

@@ -178,5 +178,5 @@ export const aetherFlow: FlowDiagram = {
     detail: '25 tables · 12 under row-level security · embeddings computed locally (no text leaves)',
   },
   caption: 'Code makes every decision; the model only writes the explanation. Run out of AI budget and only the wording degrades.',
-  runsOn: 'Four services on Render and Vercel · Neon Postgres · 1,323 tests, none skipped',
+  runsOn: '3 FastAPI services on Render · 2 Next.js apps on Vercel · Neon Postgres · 1,388 tests, none skipped',
 };
